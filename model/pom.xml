@@ -9,14 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>arseedingsdk4j-codec</artifactId>
+    <artifactId>arseedingsdk4j-model</artifactId>
     <packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.github.permadao</groupId>
-            <artifactId>arseedingsdk4j-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 </project>

@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>com.github.permadao</groupId>
-            <artifactId>arseedingsdk4j-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.permadao</groupId>
             <artifactId>arseedingsdk4j-network</artifactId>
             <version>${project.version}</version>
         </dependency>

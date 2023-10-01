@@ -13,6 +13,7 @@
         <module>util</module>
         <module>codec</module>
         <module>sdk</module>
+        <module>model</module>
     </modules>
 
     <properties>
