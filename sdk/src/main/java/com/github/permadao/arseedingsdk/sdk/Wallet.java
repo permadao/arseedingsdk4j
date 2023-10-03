@@ -1,4 +1,6 @@
-package com.github.permadao.model.wallet;
+package com.github.permadao.arseedingsdk.sdk;
+
+import com.github.permadao.model.wallet.KeyPair;
 
 /**
  * @author shiwen.wy
@@ -22,4 +24,8 @@ public interface Wallet {
 
   // 获取秘钥对
   KeyPair getKeyPair();
+
+  int signType();
+
+  byte[] sign(byte[] msg);
 }

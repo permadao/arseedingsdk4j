@@ -12,4 +12,11 @@
     <artifactId>arseedingsdk4j-network</artifactId>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.github.permadao</groupId>
+            <artifactId>arseedingsdk4j-exception</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

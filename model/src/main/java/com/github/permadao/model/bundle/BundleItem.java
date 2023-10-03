@@ -19,6 +19,77 @@ public class BundleItem implements Serializable {
   private String id;
   private String tagsBy;
 
+  public static class Builder {
+    private int signatureType;
+    private String signature;
+    private String owner;
+    private String target;
+    private String anchor;
+    private List<Tag> tags;
+    private String data;
+    private String id;
+    private String tagsBy;
+
+    public Builder signatureType(int signatureType) {
+      this.signatureType = signatureType;
+      return this;
+    }
+
+    public Builder signature(String signature) {
+      this.signature = signature;
+      return this;
+    }
+
+    public Builder owner(String owner) {
+      this.owner = owner;
+      return this;
+    }
+
+    public Builder target(String target) {
+      this.target = target;
+      return this;
+    }
+
+    public Builder anchor(String anchor) {
+      this.anchor = anchor;
+      return this;
+    }
+
+    public Builder tags(List<Tag> tags) {
+      this.tags = tags;
+      return this;
+    }
+
+    public Builder data(String data) {
+      this.data = data;
+      return this;
+    }
+
+    public Builder id(String id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder tagsBy(String tagsBy) {
+      this.tagsBy = tagsBy;
+      return this;
+    }
+
+    public BundleItem build() {
+      BundleItem bundleItem = new BundleItem();
+      bundleItem.signatureType = this.signatureType;
+      bundleItem.signature = this.signature;
+      bundleItem.owner = this.owner;
+      bundleItem.target = this.target;
+      bundleItem.anchor = this.anchor;
+      bundleItem.tags = this.tags;
+      bundleItem.data = this.data;
+      bundleItem.id = this.id;
+      bundleItem.tagsBy = this.tagsBy;
+      return bundleItem;
+    }
+  }
+
   public byte[] toItemBinary() {
     // TODO
     return null;

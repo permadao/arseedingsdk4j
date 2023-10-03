@@ -18,5 +18,10 @@
             <artifactId>arseedingsdk4j-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>1.7.4</version>
+        </dependency>
     </dependencies>
 </project>

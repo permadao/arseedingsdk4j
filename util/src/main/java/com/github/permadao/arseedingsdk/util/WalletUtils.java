@@ -1,4 +1,4 @@
-package com.github.permadao.arseedingsdk.util.wallet;
+package com.github.permadao.arseedingsdk.util;
 
 /**
  * @author shiwen.wy

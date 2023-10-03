@@ -2,7 +2,7 @@ package com.github.permadao.arseedingsdk.sdk.impl;
 
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.ArSDK;
-import com.github.permadao.model.wallet.Wallet;
+import com.github.permadao.arseedingsdk.sdk.Wallet;
 
 /**
  * @author shiwen.wy
