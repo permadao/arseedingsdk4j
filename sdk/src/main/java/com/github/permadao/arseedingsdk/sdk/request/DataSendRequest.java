@@ -1,6 +1,7 @@
 package com.github.permadao.arseedingsdk.sdk.request;
 
 import com.github.permadao.arseedingsdk.codec.Base64Util;
+import com.github.permadao.arseedingsdk.codec.BundleItemBinary;
 import com.github.permadao.arseedingsdk.codec.BundleItemSigner;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
@@ -63,6 +64,8 @@ public class DataSendRequest {
     byte[] bytes = SHA256Utils.sha256(signedMsg);
     bundleItem.setId(Base64Util.base64Encode(bytes));
     bundleItem.setSignature(Base64Util.base64Encode(signedMsg));
+
+    byte[] itemBinary = BundleItemBinary.generateItemBinary(bundleItem);
     return null;
   }
 

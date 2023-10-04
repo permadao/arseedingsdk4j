@@ -15,6 +15,7 @@
         <module>sdk</module>
         <module>model</module>
         <module>exception</module>
+        <module>examples</module>
     </modules>
 
     <properties>
