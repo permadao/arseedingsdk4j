@@ -15,4 +15,5 @@ public interface ArSeedingService {
 
     InputStream sendBytesRequestToArSeeding(String pathName, byte[] request,
         HashMap<String, String> headers) throws IOException;
+    InputStream sendGetRequestToArSeeding(String pathName, HashMap<String, String> headers) throws IOException;
 }
