@@ -39,4 +39,9 @@ public class ArweaveWallet implements Wallet {
   public byte[] sign(byte[] msg) {
     return new byte[0];
   }
+
+  @Override
+  public String payTxSign(byte[] msg) {
+    return null;
+  }
 }

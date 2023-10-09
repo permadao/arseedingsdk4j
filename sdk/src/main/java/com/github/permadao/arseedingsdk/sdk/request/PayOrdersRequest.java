@@ -14,6 +14,7 @@ import com.github.permadao.arseedingsdk.util.EverPayUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,8 +106,8 @@ public class PayOrdersRequest {
     PayTransaction payTransaction =
         buildPayTransaction(tokenInfo, action, totalFee, dataJs, orders.get(0).getBundler());
 
-    // sign tx
-
+    payTransaction.setSig(
+        wallet.payTxSign(payTransaction.string().getBytes(StandardCharsets.UTF_8)));
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
     InputStream inputStream = arSeedingService.sendJsonRequestToArSeeding("/tx", jsonStr, null);
 

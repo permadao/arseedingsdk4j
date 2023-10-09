@@ -23,4 +23,6 @@ public interface Wallet {
   SignTypeEnum signType();
 
   byte[] sign(byte[] msg);
+
+  String payTxSign(byte[] msg);
 }

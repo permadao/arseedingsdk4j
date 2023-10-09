@@ -3,6 +3,7 @@ package com.github.permadao.arseedingsdk.sdk.impl;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.permadao.arseedingsdk.util.HexEncoderUtils;
 import com.github.permadao.model.wallet.KeyPair;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.model.wallet.SignTypeEnum;
@@ -209,5 +210,10 @@ public class EthereumWallet implements Wallet {
   public byte[] sign(byte[] msg) {
     Sign.SignatureData signatureData = Sign.signPrefixedMessage(msg, ecKeyPair);
     return signatureData.getS();
+  }
+
+  @Override
+  public String payTxSign(byte[] msg) {
+    return HexEncoderUtils.encode(sign(msg));
   }
 }
