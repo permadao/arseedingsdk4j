@@ -1,16 +1,18 @@
 package com.github.permadao.arseedingsdk.sdk.request;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.sdk.model.AccountBalances;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
+import com.github.permadao.arseedingsdk.sdk.model.PayTransaction;
 import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
 import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.arseedingsdk.util.AssertUtils;
+import com.github.permadao.arseedingsdk.util.EverPayUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,10 +101,35 @@ public class PayOrdersRequest {
 
     TokenInfo tokenInfo = tokens.get(useTag);
     AssertUtils.notNull(tokenInfo, "TokenInfo is null, useTag = " + useTag);
+    String action = "transfer";
+    PayTransaction payTransaction =
+        buildPayTransaction(tokenInfo, action, totalFee, dataJs, orders.get(0).getBundler());
 
-    //    Transaction everTx = s.Pay.Transfer(useTag, totalFee, orders.get(0).getBundler(), dataJs);
+    // sign tx
 
-    return null;
+    String jsonStr = objectMapper.writeValueAsString(payTransaction);
+    InputStream inputStream = arSeedingService.sendJsonRequestToArSeeding("/tx", jsonStr, null);
+
+    return objectMapper.readValue(inputStream, PayOrdersResponse.class);
+  }
+
+  private PayTransaction buildPayTransaction(
+      TokenInfo tokenInfo, String action, BigDecimal totalFee, String dataJs, String bundler) {
+    PayTransaction tx = new PayTransaction();
+    tx.setAction(action);
+    tx.setAmount(totalFee == null ? "0" : totalFee.toString());
+    tx.setChainID(tokenInfo.getChainID());
+    tx.setData(dataJs);
+    tx.setFee(tokenInfo.getTransferFee());
+    tx.setFrom(wallet.getAddress());
+    tx.setChainType(tokenInfo.getChainType());
+    tx.setNonce(String.valueOf(EverPayUtils.getNonce()));
+    tx.setTo(bundler);
+    tx.setFeeRecipient(feeRecipient);
+    tx.setTokenID(tokenInfo.getId());
+    tx.setTokenSymbol(tokenInfo.getSymbol());
+    tx.setVersion("v1");
+    return tx;
   }
 
   private AccountBalances getAccountBalances(String address) throws IOException {
