@@ -13,7 +13,4 @@ public class BundleItemBinary {
         // TODO
         return null;
     }
-
-    public static BundleItem parseBundleItem(InputStream binaryStream) {
-    }
 }
