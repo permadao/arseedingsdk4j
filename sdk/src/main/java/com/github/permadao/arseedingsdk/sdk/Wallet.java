@@ -1,6 +1,7 @@
 package com.github.permadao.arseedingsdk.sdk;
 
 import com.github.permadao.model.wallet.KeyPair;
+import com.github.permadao.model.wallet.SignTypeEnum;
 
 /**
  * @author shiwen.wy
@@ -9,12 +10,6 @@ import com.github.permadao.model.wallet.KeyPair;
 public interface Wallet {
   // 获取钱包地址
   String getAddress();
-
-  // 获取钱包余额
-  double getBalance();
-
-  // 发起转账交易
-  boolean sendTransaction(String toAddress, double amount);
 
   // 导出钱包私钥
   String exportPrivateKey();
@@ -25,7 +20,7 @@ public interface Wallet {
   // 获取秘钥对
   KeyPair getKeyPair();
 
-  int signType();
+  SignTypeEnum signType();
 
   byte[] sign(byte[] msg);
 }
