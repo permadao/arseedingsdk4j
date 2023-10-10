@@ -40,6 +40,11 @@
                 <artifactId>commons-lang</artifactId>
                 <version>2.6</version>
             </dependency>
+            <dependency>
+                <groupId>org.web3j</groupId>
+                <artifactId>crypto</artifactId>
+                <version>4.9.8</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -55,6 +60,10 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>crypto</artifactId>
         </dependency>
     </dependencies>
 
