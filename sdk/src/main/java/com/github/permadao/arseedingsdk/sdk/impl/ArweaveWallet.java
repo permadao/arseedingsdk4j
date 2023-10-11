@@ -2,6 +2,7 @@ package com.github.permadao.arseedingsdk.sdk.impl;
 
 import com.github.permadao.model.wallet.KeyPair;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
+import com.github.permadao.model.wallet.SignTypeEnum;
 
 /**
  * @author shiwen.wy
@@ -12,16 +13,6 @@ public class ArweaveWallet implements Wallet {
   @Override
   public String getAddress() {
     return null;
-  }
-
-  @Override
-  public double getBalance() {
-    return 0;
-  }
-
-  @Override
-  public boolean sendTransaction(String toAddress, double amount) {
-    return false;
   }
 
   @Override
@@ -40,12 +31,17 @@ public class ArweaveWallet implements Wallet {
   }
 
   @Override
-  public int signType() {
-    return 0;
+  public SignTypeEnum signType() {
+    return SignTypeEnum.ARWEAVE;
   }
 
   @Override
   public byte[] sign(byte[] msg) {
     return new byte[0];
+  }
+
+  @Override
+  public String payTxSign(byte[] msg) {
+    return null;
   }
 }
