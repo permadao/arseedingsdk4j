@@ -1,5 +1,6 @@
 package com.github.permadao.arseedingsdk.sdk;
 
+import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
 import com.github.permadao.model.bundle.Tag;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public interface ArSDK {
 
-  void sendDataAndPay(
+  DataSendOrderResponse sendDataAndPay(
       byte[] data,
       String currency,
       List<Tag> tags,

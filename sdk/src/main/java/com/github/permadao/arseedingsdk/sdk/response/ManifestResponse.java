@@ -1,7 +1,7 @@
 package com.github.permadao.arseedingsdk.sdk.response;
 
-import com.github.permadao.model.scheam.RespOrder;
-import com.github.permadao.model.tx.Transaction;
+import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
+import com.github.permadao.arseedingsdk.sdk.model.PayTransaction;
 
 import java.util.List;
 
@@ -9,19 +9,19 @@ public class ManifestResponse {
 
 
     public static class UploadResponse{
-          private List<RespOrder> orders;
+          private List<PayOrder> orders;
           private String itemId;
 
-          public UploadResponse(List<RespOrder> orders, String itemId) {
+          public UploadResponse(List<PayOrder> orders, String itemId) {
               this.orders = orders;
               this.itemId = itemId;
           }
 
-          public List<RespOrder> getOrders() {
+          public List<PayOrder> getOrders() {
               return orders;
           }
 
-          public void setOrders(List<RespOrder> orders) {
+          public void setOrders(List<PayOrder> orders) {
               this.orders = orders;
           }
 
@@ -36,9 +36,11 @@ public class ManifestResponse {
 
     public static class UploadFolderAndPayResponse{
         private UploadResponse uploadResponse;
-        private List<Transaction> everTxs;
-        public UploadFolderAndPayResponse(List<RespOrder> orders, String itemId, List<Transaction> everTxs) {
-            super();
+        private List<PayTransaction> everTxs;
+
+        public UploadFolderAndPayResponse(UploadResponse uploadResponse, List<PayTransaction> everTxs) {
+            this.uploadResponse = uploadResponse;
+            this.everTxs = everTxs;
         }
 
         public UploadResponse getUploadResponse() {
@@ -49,11 +51,11 @@ public class ManifestResponse {
             this.uploadResponse = uploadResponse;
         }
 
-        public List<Transaction> getEverTxs() {
+        public List<PayTransaction> getEverTxs() {
             return everTxs;
         }
 
-        public void setEverTxs(List<Transaction> everTxs) {
+        public void setEverTxs(List<PayTransaction> everTxs) {
             this.everTxs = everTxs;
         }
     }
