@@ -1,8 +1,11 @@
 package com.github.permadao.arseedingsdk.sdk.impl;
 
-import com.github.permadao.model.wallet.KeyPair;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.model.wallet.SignTypeEnum;
+
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 
 /**
  * @author shiwen.wy
@@ -10,24 +13,54 @@ import com.github.permadao.model.wallet.SignTypeEnum;
  */
 public class ArweaveWallet implements Wallet {
 
+  private KeyPair keyPair;
+
+  public ArweaveWallet(KeyPair keyPair) {
+    this.keyPair = keyPair;
+  }
+
+  public static ArweaveWallet loanArweaveWallet(String privateKey) {
+    return new ArweaveWallet(generateKeyPairFromPrivateKey(privateKey));
+  }
+
+  private static KeyPair generateKeyPairFromPrivateKey(String privateKeyBase64) {
+    try {
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+      byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyBase64);
+
+      PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+      PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+
+      // Create a PublicKey from the PrivateKey (not secure for all cases)
+      // This is typically not recommended, but it's possible in some scenarios.
+      java.security.spec.X509EncodedKeySpec publicKeySpec =
+          new java.security.spec.X509EncodedKeySpec(privateKey.getEncoded());
+      PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+      return new KeyPair(publicKey, privateKey);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
   @Override
   public String getAddress() {
-    return null;
+    PublicKey publicKey = keyPair.getPublic();
+    byte[] publicKeyBytes = publicKey.getEncoded();
+    return Base64.getEncoder().encodeToString(publicKeyBytes);
   }
 
   @Override
   public String exportPrivateKey() {
-    return null;
+    PrivateKey privateKey = keyPair.getPrivate();
+    byte[] privateKeyBytes = privateKey.getEncoded();
+    return Base64.getEncoder().encodeToString(privateKeyBytes);
   }
 
   @Override
   public String exportPublicKey() {
-    return null;
-  }
-
-  @Override
-  public KeyPair getKeyPair() {
-    return null;
+    return getAddress();
   }
 
   @Override
@@ -37,7 +70,15 @@ public class ArweaveWallet implements Wallet {
 
   @Override
   public byte[] sign(byte[] msg) {
-    return new byte[0];
+    try {
+      Signature signature = Signature.getInstance("SHA256withRSA");
+      signature.initSign(keyPair.getPrivate());
+      signature.update(msg);
+      return signature.sign();
+    } catch (Exception e) {
+      // TODO
+    }
+    return null;
   }
 
   @Override
