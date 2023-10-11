@@ -48,10 +48,9 @@ public class ArHttpSDK implements ArSDK {
   }
 
   @Override
-  public void sendDataAndPay(byte[] data, String currency, List<Tag> tags,
+  public DataSendOrderResponse sendDataAndPay(byte[] data, String currency, List<Tag> tags,
       String target, String anchor, boolean needSequence) throws Exception {
-    DataSendOrderResponse dataSendResponse =
-        new DataSendRequest(arSeedingService, wallet).send(data, currency, tags,
+    return new DataSendRequest(arSeedingService, wallet).send(data, currency, tags,
             target, anchor, needSequence);
 
   }

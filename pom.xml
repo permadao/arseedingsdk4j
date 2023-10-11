@@ -45,6 +45,11 @@
                 <artifactId>crypto</artifactId>
                 <version>4.9.8</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>32.1.2-jre</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -64,6 +69,10 @@
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
 
