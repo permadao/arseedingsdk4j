@@ -2,10 +2,12 @@ package com.github.permadao.arseedingsdk.sdk.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.sdk.IManifest;
+import com.github.permadao.arseedingsdk.sdk.converter.PayOrderConverter;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
 import com.github.permadao.arseedingsdk.sdk.model.PayTransaction;
 import com.github.permadao.arseedingsdk.sdk.request.PayOrdersRequest;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
+import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
 import com.github.permadao.arseedingsdk.sdk.response.ManifestResponse;
 import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.model.bundle.Tag;
@@ -72,8 +74,9 @@ public class Manifest implements IManifest {
                     Tag tag = new Tag();
                     tag.setName("Content-Type");
                     tag.setValue(Files.probeContentType(Paths.get(pathFile)));
-                    DataSendOrderResponse order = arHttpSDK.sendDataAndPay(bytes, currency, Lists.newArrayList(tag), "", "", needSequence);
-                    orders.add(transform(order));
+                    DataSendResponse
+                        order = arHttpSDK.sendData(bytes, currency, Lists.newArrayList(tag), "", "", needSequence);
+                    orders.add(PayOrderConverter.dataSendResponseConvertToPayOrder(order));
                     manifestData.getPaths().put(pathFile, new ManifestData.Resource(order.getItemId()));
                 } catch (Exception e) {
                     System.out.println(String.format("ERROR:An exception occurred during uploading file [%s],the exception's details are  ", pathFile) + e);
@@ -88,8 +91,8 @@ public class Manifest implements IManifest {
         tag.setValue("manifest");
         tag2.setName("Content-Type");
         tag2.setValue("application/x.arweave-manifest+json");
-        DataSendOrderResponse order = arHttpSDK.sendDataAndPay(manifestBytes, currency, Lists.newArrayList(tag,tag2), "", "", needSequence);;
-        orders.add(transform(order));
+        DataSendResponse order = arHttpSDK.sendData(manifestBytes, currency, Lists.newArrayList(tag,tag2), "", "", needSequence);;
+        orders.add(PayOrderConverter.dataSendResponseConvertToPayOrder(order));
         return new ManifestResponse.UploadResponse(orders, order.getItemId());
     }
 

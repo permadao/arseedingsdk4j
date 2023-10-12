@@ -1,6 +1,9 @@
 package com.github.permadao.arseedingsdk.sdk;
 
+import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
+import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
+import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.model.bundle.Tag;
 
 import java.util.List;
@@ -18,4 +21,13 @@ public interface ArSDK {
       String target,
       String anchor,
       boolean needSequence) throws Exception;
+
+  DataSendResponse sendData(byte[] data,
+      String currency,
+      List<Tag> tags,
+      String target,
+      String anchor,
+      boolean needSequence) throws Exception;
+
+  PayOrdersResponse payOrders(List<PayOrder> orders) throws Exception;
 }
