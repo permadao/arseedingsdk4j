@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class Manifest implements IManifest {
@@ -52,7 +52,6 @@ public class Manifest implements IManifest {
     }
 
 
-
     public ManifestResponse.UploadResponse uploadFolder(String rootPath, int batchSize, String indexFile, String currency, boolean needSequence) throws Exception {
         if (StringUtils.isEmpty(indexFile)) {
             indexFile = "index.html";
@@ -62,11 +61,16 @@ public class Manifest implements IManifest {
                 .manifest("arweave/paths")
                 .version("0.1.0")
                 .index(indexFile)
-                .paths(new HashMap<>(8)).build();
+                .paths(new ConcurrentHashMap<>(8)).build();
         List<String> pathFiles = getPathFiles(rootPath);
         CopyOnWriteArrayList<PayOrder> orders = new CopyOnWriteArrayList<>();
+        if (batchSize == 0) {
+            batchSize = 10;
+        }
+        ExecutorService threadPool = Executors.newFixedThreadPool(batchSize);
+        CountDownLatch countDownLatch = new CountDownLatch(pathFiles.size());
         for (String pathFile : pathFiles) {
-            Thread t = new Thread(() -> {
+            threadPool.submit(() -> {
                 try {
                     byte[] bytes = readFileData(pathFile);
                     Tag tag = new Tag();
@@ -75,12 +79,13 @@ public class Manifest implements IManifest {
                     DataSendOrderResponse order = arHttpSDK.sendDataAndPay(bytes, currency, Lists.newArrayList(tag), "", "", needSequence);
                     orders.add(transform(order));
                     manifestData.getPaths().put(pathFile, new ManifestData.Resource(order.getItemId()));
+                    countDownLatch.countDown();
                 } catch (Exception e) {
                     System.out.println(String.format("ERROR:An exception occurred during uploading file [%s],the exception's details are  ", pathFile) + e);
                 }
             });
-            t.start();
         }
+        countDownLatch.await();
         byte[] manifestBytes = new ObjectMapper().writeValueAsBytes(manifestData);
         Tag tag = new Tag();
         Tag tag2 = new Tag();
@@ -88,7 +93,8 @@ public class Manifest implements IManifest {
         tag.setValue("manifest");
         tag2.setName("Content-Type");
         tag2.setValue("application/x.arweave-manifest+json");
-        DataSendOrderResponse order = arHttpSDK.sendDataAndPay(manifestBytes, currency, Lists.newArrayList(tag,tag2), "", "", needSequence);;
+        DataSendOrderResponse order = arHttpSDK.sendDataAndPay(manifestBytes, currency, Lists.newArrayList(tag, tag2), "", "", needSequence);
+        ;
         orders.add(transform(order));
         return new ManifestResponse.UploadResponse(orders, order.getItemId());
     }
@@ -134,7 +140,7 @@ public class Manifest implements IManifest {
         return everTxs;
     }
 
-    public PayTransaction transform(PayOrdersResponse payOrdersResponse){
+    public PayTransaction transform(PayOrdersResponse payOrdersResponse) {
         PayTransaction payTransaction = new PayTransaction();
         payTransaction.setTokenSymbol(payOrdersResponse.getTokenSymbol());
         payTransaction.setAction(payOrdersResponse.getAction());
@@ -153,7 +159,7 @@ public class Manifest implements IManifest {
         return payTransaction;
     }
 
-    public PayOrder transform(DataSendOrderResponse dataSendOrderResponse){
+    public PayOrder transform(DataSendOrderResponse dataSendOrderResponse) {
         PayOrder payOrder = new PayOrder();
         payOrder.setItemId(dataSendOrderResponse.getItemId());
         payOrder.setSize(dataSendOrderResponse.getSize());
