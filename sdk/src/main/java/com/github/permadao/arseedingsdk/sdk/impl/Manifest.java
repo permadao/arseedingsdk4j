@@ -155,18 +155,4 @@ public class Manifest implements IManifest {
         payTransaction.setSig(payOrdersResponse.getSig());
         return payTransaction;
     }
-
-    public PayOrder transform(DataSendOrderResponse dataSendOrderResponse){
-        PayOrder payOrder = new PayOrder();
-        payOrder.setItemId(dataSendOrderResponse.getItemId());
-        payOrder.setSize(dataSendOrderResponse.getSize());
-        payOrder.setBundler(dataSendOrderResponse.getBundler());
-        payOrder.setCurrency(dataSendOrderResponse.getCurrency());
-        payOrder.setDecimals(dataSendOrderResponse.getDecimals());
-        payOrder.setFee(dataSendOrderResponse.getFee());
-        payOrder.setPaymentExpiredTime(dataSendOrderResponse.getPaymentExpiredTime());
-        payOrder.setExpectedBlock(dataSendOrderResponse.getExpectedBlock());
-        return payOrder;
-
-    }
 }
