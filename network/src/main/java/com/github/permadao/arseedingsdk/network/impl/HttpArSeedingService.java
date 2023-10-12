@@ -75,13 +75,23 @@ public class HttpArSeedingService implements ArSeedingService {
 
     RequestBody requestBody = RequestBody.create(BYTE_MEDIA_TYPE, request);
     byte[] res = send(headers, arSeedingHost + pathName, requestBody);
-    return res == null ? null : new ByteArrayInputStream(res);
+      return new ByteArrayInputStream(res);
   }
 
-  @Override
-  public InputStream sendGetRequestToArSeeding(String pathName, HashMap<String, String> headers) throws IOException {
-    byte[] res = send(headers, arSeedingHost + pathName, null);
-    return res == null ? null : new ByteArrayInputStream(res);
-  }
+    @Override
+    public String sendPayRequest(String pathName) throws IOException {
+        Request request =
+                new Request.Builder()
+                        .url(payHost + pathName) // Replace with your API endpoint
+                        .build();
 
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (response == null || !response.isSuccessful() || response.body() == null) {
+                throw new ConnectionException(
+                        "Failed to retrieve sendPayRequest: " + response.body().string());
+            }
+
+            return response.body().string();
+        }
+    }
 }
