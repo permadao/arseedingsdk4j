@@ -23,10 +23,10 @@ public class HttpArSeedingService implements ArSeedingService {
   private OkHttpClient httpClient;
 
   public static final MediaType JSON_MEDIA_TYPE =
-      MediaType.parse("application/json; charset=utf-8");
+          MediaType.parse("application/json; charset=utf-8");
 
   public static final MediaType BYTE_MEDIA_TYPE =
-      MediaType.parse("application/octet-stream; charset=utf-8");
+          MediaType.parse("application/octet-stream; charset=utf-8");
 
   public HttpArSeedingService(String arSeedingHost, String payHost, OkHttpClient httpClient) {
     this.arSeedingHost = arSeedingHost;
@@ -36,7 +36,7 @@ public class HttpArSeedingService implements ArSeedingService {
 
   @Override
   public InputStream sendJsonRequestToArSeeding(
-      String pathName, String request, HashMap<String, String> headers) throws IOException {
+          String pathName, String request, HashMap<String, String> headers) throws IOException {
     RequestBody requestBody = RequestBody.create(request, JSON_MEDIA_TYPE);
 
     byte[] res = send(headers, arSeedingHost + pathName, requestBody);
@@ -45,10 +45,10 @@ public class HttpArSeedingService implements ArSeedingService {
   }
 
   private byte[] send(HashMap<String, String> headers, String url, RequestBody requestBody)
-      throws IOException {
+          throws IOException {
     Headers httpHeaders = Headers.of(headers);
     okhttp3.Request httpRequest =
-        new okhttp3.Request.Builder().url(url).headers(httpHeaders).post(requestBody).build();
+            new okhttp3.Request.Builder().url(url).headers(httpHeaders).post(requestBody).build();
 
     try (okhttp3.Response response = httpClient.newCall(httpRequest).execute()) {
       ResponseBody responseBody = response.body();
@@ -69,7 +69,7 @@ public class HttpArSeedingService implements ArSeedingService {
 
   @Override
   public InputStream sendBytesRequestToArSeeding(
-      String pathName, byte[] request, HashMap<String, String> headers) throws IOException {
+          String pathName, byte[] request, HashMap<String, String> headers) throws IOException {
 
     RequestBody requestBody = RequestBody.create(BYTE_MEDIA_TYPE, request);
     byte[] res = send(headers, arSeedingHost + pathName, requestBody);
@@ -79,14 +79,14 @@ public class HttpArSeedingService implements ArSeedingService {
   @Override
   public String sendPayRequest(String pathName) throws IOException {
     Request request =
-        new Request.Builder()
-            .url(payHost + pathName) // Replace with your API endpoint
-            .build();
+            new Request.Builder()
+                    .url(payHost + pathName) // Replace with your API endpoint
+                    .build();
 
     try (Response response = httpClient.newCall(request).execute()) {
       if (response == null || !response.isSuccessful() || response.body() == null) {
         throw new ConnectionException(
-            "Failed to retrieve sendPayRequest: " + response.body().string());
+                "Failed to retrieve sendPayRequest: " + response.body().string());
       }
 
       return response.body().string();
