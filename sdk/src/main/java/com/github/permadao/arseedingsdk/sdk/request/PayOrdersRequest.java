@@ -51,7 +51,7 @@ public class PayOrdersRequest {
     verifyOrders(orders);
 
     if (orders.get(0).getFee().isEmpty()) {
-      return null; // arseeding NO_FEE module
+      return null;
     }
 
     BigDecimal totalFee = BigDecimal.ZERO;
@@ -139,7 +139,7 @@ public class PayOrdersRequest {
     return objectMapper.readValue(balancesStr, AccountBalances.class);
   }
 
-  public List<String> symbolToTagArr(String symbol) {
+  private List<String> symbolToTagArr(String symbol) {
     List<String> tagArr = new ArrayList<>();
 
     for (Map.Entry<String, TokenInfo> entry : tokens.entrySet()) {

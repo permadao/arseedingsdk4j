@@ -1,7 +1,11 @@
 package com.github.permadao.arseedingsdk.sdk.impl;
 
+import com.github.permadao.arseedingsdk.codec.Base64Util;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
+import com.github.permadao.arseedingsdk.util.SHA256Utils;
 import com.github.permadao.model.wallet.SignTypeEnum;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.web3j.crypto.Sign;
 
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -13,7 +17,7 @@ import java.util.Base64;
  */
 public class ArweaveWallet implements Wallet {
 
-  private KeyPair keyPair;
+  private final KeyPair keyPair;
 
   public ArweaveWallet(KeyPair keyPair) {
     this.keyPair = keyPair;
@@ -83,6 +87,22 @@ public class ArweaveWallet implements Wallet {
 
   @Override
   public String payTxSign(byte[] msg) {
-    return null;
+    byte[] textHash = Sign.getEthereumMessageHash(msg);
+    byte[] hashedMessage = SHA256Utils.sha256(textHash);
+
+    Signature signature = null;
+    try {
+      signature = Signature.getInstance("SHA256withRSA");
+      signature.initSign(keyPair.getPrivate());
+      // 使用私钥对消息进行签名
+      signature.update(hashedMessage);
+      byte[] signatureBytes = signature.sign();
+      RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+      return Base64Util.base64Encode(signatureBytes)
+          + ","
+          + Base64Util.base64Encode(publicKey.getModulus().toByteArray());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

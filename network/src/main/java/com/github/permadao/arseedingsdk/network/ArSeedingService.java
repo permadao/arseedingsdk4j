@@ -10,12 +10,12 @@ import java.util.HashMap;
  */
 public interface ArSeedingService {
 
-    InputStream sendJsonRequestToArSeeding(String pathName, String request,
+    InputStream sendJsonRequestToArSeeding(String path, String request,
         HashMap<String, String> headers) throws IOException;
 
-    InputStream sendBytesRequestToArSeeding(String pathName, byte[] request,
+    InputStream sendBytesRequestToArSeeding(String path, byte[] request,
         HashMap<String, String> headers) throws IOException;
 
 
-    String sendPayRequest(String pathName) throws IOException;
+    String sendPayRequest(String path) throws IOException;
 }

@@ -9,18 +9,24 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import com.github.permadao.exception.ConnectionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * http client connent to arseeding or everpay
+ *
  * @author shiwen.wy
  * @date 2023/10/1 14:16
  */
 public class HttpArSeedingService implements ArSeedingService {
 
-  private String arSeedingHost;
+  private static final Logger log = LoggerFactory.getLogger(HttpArSeedingService.class);
 
-  private String payHost;
+  private final String arSeedingHost;
 
-  private OkHttpClient httpClient;
+  private final String payHost;
+
+  private final OkHttpClient httpClient;
 
   public static final MediaType JSON_MEDIA_TYPE =
       MediaType.parse("application/json; charset=utf-8");
@@ -36,12 +42,38 @@ public class HttpArSeedingService implements ArSeedingService {
 
   @Override
   public InputStream sendJsonRequestToArSeeding(
-      String pathName, String request, HashMap<String, String> headers) throws IOException {
+      String path, String request, HashMap<String, String> headers) throws IOException {
     RequestBody requestBody = RequestBody.create(request, JSON_MEDIA_TYPE);
 
-    byte[] res = send(headers, arSeedingHost + pathName, requestBody);
+    byte[] res = send(headers, arSeedingHost + path, requestBody);
 
     return res == null ? null : new ByteArrayInputStream(res);
+  }
+
+  @Override
+  public InputStream sendBytesRequestToArSeeding(
+      String path, byte[] request, HashMap<String, String> headers) throws IOException {
+
+    RequestBody requestBody = RequestBody.create(BYTE_MEDIA_TYPE, request);
+    byte[] res = send(headers, arSeedingHost + path, requestBody);
+    return new ByteArrayInputStream(res);
+  }
+
+  @Override
+  public String sendPayRequest(String path) throws IOException {
+    Request request =
+        new Request.Builder()
+            .url(payHost + path) // Replace with your API endpoint
+            .build();
+
+    try (Response response = httpClient.newCall(request).execute()) {
+      if (response == null || !response.isSuccessful() || response.body() == null) {
+        throw new ConnectionException(
+            "Failed to retrieve sendPayRequest: " + response.body().string());
+      }
+
+      return response.body().string();
+    }
   }
 
   private byte[] send(HashMap<String, String> headers, String url, RequestBody requestBody)
@@ -64,32 +96,6 @@ public class HttpArSeedingService implements ArSeedingService {
 
         throw new ConnectionException("Invalid response received: " + code + "; " + text);
       }
-    }
-  }
-
-  @Override
-  public InputStream sendBytesRequestToArSeeding(
-      String pathName, byte[] request, HashMap<String, String> headers) throws IOException {
-
-    RequestBody requestBody = RequestBody.create(BYTE_MEDIA_TYPE, request);
-    byte[] res = send(headers, arSeedingHost + pathName, requestBody);
-    return new ByteArrayInputStream(res);
-  }
-
-  @Override
-  public String sendPayRequest(String pathName) throws IOException {
-    Request request =
-        new Request.Builder()
-            .url(payHost + pathName) // Replace with your API endpoint
-            .build();
-
-    try (Response response = httpClient.newCall(request).execute()) {
-      if (response == null || !response.isSuccessful() || response.body() == null) {
-        throw new ConnectionException(
-            "Failed to retrieve sendPayRequest: " + response.body().string());
-      }
-
-      return response.body().string();
     }
   }
 }

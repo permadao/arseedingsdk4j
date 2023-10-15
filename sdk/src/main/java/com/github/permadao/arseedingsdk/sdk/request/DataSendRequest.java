@@ -15,8 +15,12 @@ import com.github.permadao.model.bundle.Tag;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.github.permadao.model.constant.UrlPathContant.DATA_SEND_TX_PATH;
+import static com.github.permadao.model.constant.UrlPathContant.DATA_SEND_TX_WITH_CURRENCY_PATH;
 
 /**
  * @author shiwen.wy
@@ -49,6 +53,27 @@ public class DataSendRequest {
 
     byte[] tagsBytes = TagUtils.serializeTags(tags);
 
+    BundleItem bundleItem = buildBundleItem(target, anchor, tags, tagsBytes, data);
+
+    byte[] itemBinary = BundleItemBinary.generateItemBinary(bundleItem);
+
+    String path = getPath(currency);
+
+    InputStream inputStream =
+        arSeedingService.sendBytesRequestToArSeeding(path, itemBinary, buildHeaders(needSequence));
+
+    return objectMapper.readValue(inputStream, DataSendResponse.class);
+  }
+
+  private String getPath(String currency) {
+    return StringUtils.isBlank(currency)
+        ? DATA_SEND_TX_PATH
+        : String.format(DATA_SEND_TX_WITH_CURRENCY_PATH, currency);
+  }
+
+  private BundleItem buildBundleItem(
+      String target, String anchor, List<Tag> tags, byte[] tagsBytes, byte[] data)
+      throws NoSuchAlgorithmException {
     BundleItem.Builder builder = new BundleItem.Builder();
     BundleItem bundleItem =
         builder
@@ -70,19 +95,10 @@ public class DataSendRequest {
     bundleItem.setId(Base64Util.base64Encode(bytes));
     bundleItem.setSignature(Base64Util.base64Encode(signedMsg));
 
-    byte[] itemBinary = BundleItemBinary.generateItemBinary(bundleItem);
-
-    String path = StringUtils.isBlank(currency) ? "/bundle/tx" :
-        String.format("/bundle/tx/%s", currency);
-
-    InputStream inputStream =
-        arSeedingService.sendBytesRequestToArSeeding(path, itemBinary,
-            buildHeaders(needSequence));
-
-    return objectMapper.readValue(inputStream, DataSendResponse.class);
+    return bundleItem;
   }
 
-  private HashMap<String, String> buildHeaders(boolean needSequence){
+  private HashMap<String, String> buildHeaders(boolean needSequence) {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("Content-Type", "application/octet-stream");
     if (needSequence) {

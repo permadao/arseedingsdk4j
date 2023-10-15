@@ -14,6 +14,8 @@ import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
 import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.model.bundle.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +28,9 @@ import java.util.Map;
  * @date 2023/10/1 21:54
  */
 public class ArHttpSDK implements ArSDK {
+
+  private static final Logger log = LoggerFactory.getLogger(ArHttpSDK.class);
+
   private ArSeedingService arSeedingService;
   private Wallet wallet;
   private Map<String, TokenInfo> tokens;
@@ -45,7 +50,7 @@ public class ArHttpSDK implements ArSDK {
       this.tokens = tokens;
       this.feeRecipient = payInfo.getFeeRecipient();
     } catch (Exception e) {
-
+      log.error("get pay info error", e);
     }
   }
 
