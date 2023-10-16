@@ -5,6 +5,7 @@ import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.ArSDK;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.sdk.converter.PayOrderConverter;
+import com.github.permadao.arseedingsdk.sdk.model.Pay;
 import com.github.permadao.arseedingsdk.sdk.model.PayInfo;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
 import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
@@ -17,7 +18,6 @@ import com.github.permadao.model.bundle.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +33,7 @@ public class ArHttpSDK implements ArSDK {
 
   private ArSeedingService arSeedingService;
   private Wallet wallet;
-  private Map<String, TokenInfo> tokens;
-  private String feeRecipient;
+  private Pay pay;
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   private ArHttpSDK(ArSeedingService arSeedingService, Wallet wallet) {
@@ -47,8 +46,7 @@ public class ArHttpSDK implements ArSDK {
       for (TokenInfo t : payInfo.getTokenList()) {
         tokens.put(t.getTag(), t);
       }
-      this.tokens = tokens;
-      this.feeRecipient = payInfo.getFeeRecipient();
+      pay = new Pay(arSeedingService, tokens, payInfo.getFeeRecipient());
     } catch (Exception e) {
       log.error("get pay info error", e);
     }
@@ -76,7 +74,7 @@ public class ArHttpSDK implements ArSDK {
     payOrderList.add(PayOrderConverter.dataSendResponseConvertToPayOrder(dataSendResponse));
 
     PayOrdersResponse payOrdersResponse =
-        new PayOrdersRequest(arSeedingService, wallet, tokens, feeRecipient).send(payOrderList);
+        new PayOrdersRequest(arSeedingService, wallet, pay).send(payOrderList);
 
     return PayOrderConverter.payOrdersResponseConvertToDataSendOrderResponse(payOrdersResponse);
   }
@@ -98,6 +96,6 @@ public class ArHttpSDK implements ArSDK {
   @Override
   public PayOrdersResponse payOrders(List<PayOrder> orders) throws Exception {
 
-    return new PayOrdersRequest(arSeedingService, wallet, tokens, feeRecipient).send(orders);
+    return new PayOrdersRequest(arSeedingService, wallet, pay).send(orders);
   }
 }
