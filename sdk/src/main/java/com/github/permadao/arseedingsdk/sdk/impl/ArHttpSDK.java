@@ -1,6 +1,17 @@
 package com.github.permadao.arseedingsdk.sdk.impl;
 
+import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
+import com.github.permadao.arseedingsdk.sdk.request.DataSendRequest;
+import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
+import com.github.permadao.arseedingsdk.util.AssertUtils;
+import com.github.permadao.model.bundle.Tag;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.ArSDK;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
@@ -8,21 +19,19 @@ import com.github.permadao.arseedingsdk.sdk.converter.PayOrderConverter;
 import com.github.permadao.arseedingsdk.sdk.model.Pay;
 import com.github.permadao.arseedingsdk.sdk.model.PayInfo;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
-import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
-import com.github.permadao.arseedingsdk.sdk.request.DataSendRequest;
 import com.github.permadao.arseedingsdk.sdk.request.ManifestRequest;
 import com.github.permadao.arseedingsdk.sdk.request.PayOrdersRequest;
 import com.github.permadao.arseedingsdk.sdk.response.*;
-import com.github.permadao.model.bundle.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.github.permadao.model.bundle.BundleFee;
+import com.github.permadao.model.bundle.BundleOrder;
+import com.github.permadao.model.bundle.SubmitBundleDataResponse;
+import java.io.InputStream;
 
-import static com.github.permadao.model.constant.UrlPathContant.PAY_INFO_PATH;
+import static com.github.permadao.model.constant.UrlPathContant.*;
 
 /**
  * @author shiwen.wy
@@ -132,5 +141,97 @@ public class ArHttpSDK implements ArSDK {
       throws Exception {
     return new ManifestRequest(this)
         .uploadFolder(rootPath, batchSize, indexFile, currency, needSequence);
+  }
+
+  @Override
+  public String submitNativeData(
+      String apiKey, String currency, byte[] data, String contentType, Map<String, String> tags)
+      throws Exception {
+    String path = BUNDLE_DATA_PATH + currency;
+
+    HashMap<String, String> headers = buildNativeDataHeaders(apiKey, contentType, tags);
+
+    InputStream responseInputStream = null;
+    try {
+      responseInputStream = arSeedingService.sendBytesRequestToArSeeding(path, data, headers);
+    } catch (Exception e) {
+      log.error("send submit native data error", e);
+      throw e;
+    }
+
+    AssertUtils.notNull(responseInputStream, "submit native data response cannot be null message!");
+
+    SubmitBundleDataResponse submitBundleDataResponse = new SubmitBundleDataResponse();
+    try {
+      submitBundleDataResponse =
+          objectMapper.readValue(responseInputStream, SubmitBundleDataResponse.class);
+    } catch (Exception e) {
+      log.error("Response trans to SubmitBundleDataResponse failed.", e);
+    }
+    return submitBundleDataResponse.getItemId();
+  }
+
+  private HashMap<String, String> buildNativeDataHeaders(
+      String apiKey, String contentType, Map<String, String> tags) {
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("X-API-KEY", apiKey);
+    headers.put("Content-Type", contentType);
+    headers.putAll(tags);
+    return headers;
+  }
+
+  @Override
+  public BundleFee bundleFee(long size, String currency) throws Exception {
+    String path = BUNDLE_FEE_PATH + size + "/" + currency;
+    InputStream responseInputStream = null;
+    try {
+      responseInputStream = arSeedingService.sendGetRequestToArSeeding(path, new HashMap<>());
+    } catch (Exception e) {
+      log.error("send bundle fee error", e);
+      throw e;
+    }
+
+    AssertUtils.notNull(responseInputStream, "bundle fee response cannot be null message!");
+
+    BundleFee bundleFee = new BundleFee();
+    try {
+      bundleFee = new ObjectMapper().readValue(responseInputStream, BundleFee.class);
+    } catch (Exception e) {
+      log.error("Response trans to BundleFee failed.", e);
+    }
+    return bundleFee;
+  }
+
+  @Override
+  public List<BundleOrder> getOrders(String addr, int startId) throws Exception {
+    String path = BUNDLE_ORDERS_PATH + addr;
+
+    HashMap<String, String> headers = buildBundleOrderHeaders(startId);
+
+    InputStream responseInputStream = null;
+    try {
+      responseInputStream = arSeedingService.sendGetRequestToArSeeding(path, headers);
+    } catch (Exception e) {
+      log.error("send bundle order error", e);
+      throw e;
+    }
+
+    AssertUtils.notNull(responseInputStream, "bundle order response cannot be null message!");
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<BundleOrder> bundleOrderList = new ArrayList<>();
+    try {
+      bundleOrderList =
+          objectMapper.readValue(responseInputStream, new TypeReference<List<BundleOrder>>() {});
+    } catch (IOException e) {
+      log.error("Response trans to BundleOrder list failed.", e);
+    }
+    return bundleOrderList;
+  }
+
+  private HashMap<String, String> buildBundleOrderHeaders(int startId) {
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("cursorId", String.valueOf(startId));
+    return headers;
   }
 }

@@ -7,6 +7,7 @@ import com.github.permadao.arseedingsdk.codec.BundleItemSigner;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
+
 import com.github.permadao.arseedingsdk.util.AssertUtils;
 import com.github.permadao.arseedingsdk.util.SHA256Utils;
 import com.github.permadao.arseedingsdk.util.TagUtils;
@@ -88,12 +89,12 @@ public class DataSendRequest {
             .data(Base64Util.base64Encode(data))
             .build();
 
-    byte[] bundleItemBytes = BundleItemSigner.bundleItemSignData(bundleItem);
+        byte[] bundleItemBytes = BundleItemSigner.bundleItemSignData(bundleItem);
 
-    byte[] signedMsg = wallet.sign(bundleItemBytes);
-    byte[] bytes = SHA256Utils.sha256(signedMsg);
-    bundleItem.setId(Base64Util.base64Encode(bytes));
-    bundleItem.setSignature(Base64Util.base64Encode(signedMsg));
+        byte[] signedMsg = wallet.sign(bundleItemBytes);
+        byte[] bytes = SHA256Utils.sha256(signedMsg);
+        bundleItem.setId(Base64Util.base64Encode(bytes));
+        bundleItem.setSignature(Base64Util.base64Encode(signedMsg));
 
     return bundleItem;
   }
@@ -107,11 +108,11 @@ public class DataSendRequest {
     return headers;
   }
 
-  private void verifyBase64DecodeResult(String data) {
-    if (StringUtils.isEmpty(data)) {
-      return;
+    private void verifyBase64DecodeResult(String data) {
+        if (StringUtils.isEmpty(data)) {
+            return;
+        }
+        byte[] bytes = Base64Util.base64Decode(data);
+        AssertUtils.isTrue(bytes.length == 32, "decode result length must be 32");
     }
-    byte[] bytes = Base64Util.base64Decode(data);
-    AssertUtils.isTrue(bytes.length == 32, "decode result length must be 32");
-  }
 }
