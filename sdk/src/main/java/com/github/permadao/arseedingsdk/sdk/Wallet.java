@@ -1,6 +1,5 @@
 package com.github.permadao.arseedingsdk.sdk;
 
-import com.github.permadao.model.wallet.KeyPair1;
 import com.github.permadao.model.wallet.SignTypeEnum;
 
 /**

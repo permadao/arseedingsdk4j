@@ -5,6 +5,8 @@ import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.util.SHA256Utils;
 import com.github.permadao.model.wallet.SignTypeEnum;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.crypto.Sign;
 
 import java.security.*;
@@ -16,7 +18,8 @@ import java.util.Base64;
  * @date 2023/10/1 15:08
  */
 public class ArweaveWallet implements Wallet {
-
+  private static final Logger log =
+          LoggerFactory.getLogger(ArweaveWallet.class);
   private final KeyPair keyPair;
 
   public ArweaveWallet(KeyPair keyPair) {
@@ -80,7 +83,7 @@ public class ArweaveWallet implements Wallet {
       signature.update(msg);
       return signature.sign();
     } catch (Exception e) {
-      // TODO
+      log.error("ArweaveWallet sign error", e);
     }
     return null;
   }
