@@ -10,10 +10,9 @@ import com.github.permadao.arseedingsdk.sdk.model.PayInfo;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
 import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
 import com.github.permadao.arseedingsdk.sdk.request.DataSendRequest;
+import com.github.permadao.arseedingsdk.sdk.request.ManifestRequest;
 import com.github.permadao.arseedingsdk.sdk.request.PayOrdersRequest;
-import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
-import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
-import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
+import com.github.permadao.arseedingsdk.sdk.response.*;
 import com.github.permadao.model.bundle.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.permadao.model.constant.UrlPathContant.PAY_INFO_PATH;
 
 /**
  * @author shiwen.wy
@@ -40,7 +41,7 @@ public class ArHttpSDK implements ArSDK {
     this.arSeedingService = arSeedingService;
     this.wallet = wallet;
     try {
-      String payInfoStr = arSeedingService.sendPayRequest("/info");
+      String payInfoStr = arSeedingService.sendPayRequest(PAY_INFO_PATH);
       PayInfo payInfo = objectMapper.readValue(payInfoStr, PayInfo.class);
       Map<String, TokenInfo> tokens = new HashMap<>();
       for (TokenInfo t : payInfo.getTokenList()) {
@@ -97,5 +98,39 @@ public class ArHttpSDK implements ArSDK {
   public PayOrdersResponse payOrders(List<PayOrder> orders) throws Exception {
 
     return new PayOrdersRequest(arSeedingService, wallet, pay).send(orders);
+  }
+
+  @Override
+  public ManifestUploadResponse uploadFolder(
+      String rootPath, int batchSize, String indexFile, String currency) throws Exception {
+    return new ManifestRequest(this).uploadFolder(rootPath, batchSize, indexFile, currency);
+  }
+
+  @Override
+  public ManifestUploadResponse uploadFolderWithNoFee(
+      String rootPath, int batchSize, String indexFile) throws Exception {
+    return new ManifestRequest(this).uploadFolderWithNoFee(rootPath, batchSize, indexFile);
+  }
+
+  @Override
+  public ManifestUploadResponse uploadFolderWithSequence(
+      String rootPath, int batchSize, String indexFile) throws Exception {
+    return new ManifestRequest(this).uploadFolderWithSequence(rootPath, batchSize, indexFile);
+  }
+
+  @Override
+  public UploadFolderAndPayResponse uploadFolderAndPay(
+      String rootPath, int batchSize, String indexFile, String currency) throws Exception {
+    PayOrdersRequest payOrdersRequest = new PayOrdersRequest(arSeedingService, wallet, pay);
+    return new ManifestRequest(this)
+        .uploadFolderAndPay(rootPath, batchSize, indexFile, currency, payOrdersRequest);
+  }
+
+  @Override
+  public ManifestUploadResponse uploadFolder(
+      String rootPath, int batchSize, String indexFile, String currency, boolean needSequence)
+      throws Exception {
+    return new ManifestRequest(this)
+        .uploadFolder(rootPath, batchSize, indexFile, currency, needSequence);
   }
 }
