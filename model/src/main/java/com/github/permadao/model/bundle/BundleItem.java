@@ -90,11 +90,6 @@ public class BundleItem implements Serializable {
     }
   }
 
-  public byte[] toItemBinary() {
-    // TODO
-    return null;
-  }
-
   public int getSignatureType() {
     return signatureType;
   }

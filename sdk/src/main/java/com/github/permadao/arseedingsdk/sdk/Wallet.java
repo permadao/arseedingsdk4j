@@ -1,6 +1,5 @@
 package com.github.permadao.arseedingsdk.sdk;
 
-import com.github.permadao.model.wallet.KeyPair;
 import com.github.permadao.model.wallet.SignTypeEnum;
 
 /**
@@ -16,9 +15,6 @@ public interface Wallet {
 
   // 导出钱包公钥
   String exportPublicKey();
-
-  // 获取秘钥对
-  KeyPair getKeyPair();
 
   SignTypeEnum signType();
 

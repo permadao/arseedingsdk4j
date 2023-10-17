@@ -11,7 +11,6 @@ import org.apache.avro.io.EncoderFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,35 +19,35 @@ import java.util.List;
  */
 public class TagUtils {
 
-    public static byte[] serializeTags(List<Tag> tags) throws IOException {
-        if (tags.isEmpty()) {
-            return new byte[0];
-        }
+  private static final String SCHEMA =
+      "{\"type\": \"array\", \"items\": {\"type\": \"record\", \"name\": \"Tag\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}]}}";
 
-        // Define Avro schema
-        String schemaJson = "{\"type\": \"array\", \"items\": {\"type\": \"record\", \"name\": \"Tag\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}]}}";
-        Schema.Parser parser = new Schema.Parser();
-        Schema schema = parser.parse(schemaJson);
+  private static final String TAG_NAME = "name";
+  private static final String TAG_VALUE = "value";
 
-        // Create Avro records
-        List<GenericRecord> avroRecords = new ArrayList<>();
-        for (Tag tag : tags) {
-            GenericRecord avroRecord = new GenericData.Record(schema);
-            avroRecord.put("name", tag.getName());
-            avroRecord.put("value", tag.getValue());
-            avroRecords.add(avroRecord);
-        }
-
-        // Serialize Avro records to byte array
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
-        DatumWriter<GenericRecord> datumWriter = new org.apache.avro.generic.GenericDatumWriter<>(schema);
-        for (GenericRecord avroRecord : avroRecords) {
-            datumWriter.write(avroRecord, encoder);
-        }
-        encoder.flush();
-        byteArrayOutputStream.close();
-
-        return byteArrayOutputStream.toByteArray();
+  public static byte[] serializeTags(List<Tag> tags) throws IOException {
+    if (tags.isEmpty()) {
+      return new byte[0];
     }
+
+    // Define Avro schema
+    Schema schema = new Schema.Parser().parse(SCHEMA);
+
+    // Serialize Avro records to byte array
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
+    DatumWriter<GenericRecord> datumWriter =
+        new org.apache.avro.generic.GenericDatumWriter<>(schema);
+
+    for (Tag tag : tags) {
+      GenericRecord avroRecord = new GenericData.Record(schema);
+      avroRecord.put(TAG_NAME, tag.getName());
+      avroRecord.put(TAG_VALUE, tag.getValue());
+      datumWriter.write(avroRecord, encoder);
+    }
+    encoder.flush();
+    byteArrayOutputStream.close();
+
+    return byteArrayOutputStream.toByteArray();
+  }
 }

@@ -8,60 +8,72 @@ import java.io.Serializable;
  */
 public class DataSendOrderResponse implements Serializable {
   private static final long serialVersionUID = -1764467976694511595L;
-  private String itemId;
+  private String tokenSymbol;
 
-  private long size;
+  private String action;
 
-  private String bundler;
+  private String from;
 
-  private String currency;
+  private String to;
 
-  private int decimals;
+  private String amount;
 
   private String fee;
 
-  private long paymentExpiredTime;
+  private String feeRecipient;
 
-  private long expectedBlock;
+  private String nonce;
 
-  public String getItemId() {
-    return itemId;
+  private String tokenID;
+
+  private String chainType;
+
+  private String chainID;
+
+  private String data;
+
+  private String version;
+
+  private String sig;
+
+  public String getTokenSymbol() {
+    return tokenSymbol;
   }
 
-  public void setItemId(String itemId) {
-    this.itemId = itemId;
+  public void setTokenSymbol(String tokenSymbol) {
+    this.tokenSymbol = tokenSymbol;
   }
 
-  public long getSize() {
-    return size;
+  public String getAction() {
+    return action;
   }
 
-  public void setSize(long size) {
-    this.size = size;
+  public void setAction(String action) {
+    this.action = action;
   }
 
-  public String getBundler() {
-    return bundler;
+  public String getFrom() {
+    return from;
   }
 
-  public void setBundler(String bundler) {
-    this.bundler = bundler;
+  public void setFrom(String from) {
+    this.from = from;
   }
 
-  public String getCurrency() {
-    return currency;
+  public String getTo() {
+    return to;
   }
 
-  public void setCurrency(String currency) {
-    this.currency = currency;
+  public void setTo(String to) {
+    this.to = to;
   }
 
-  public int getDecimals() {
-    return decimals;
+  public String getAmount() {
+    return amount;
   }
 
-  public void setDecimals(int decimals) {
-    this.decimals = decimals;
+  public void setAmount(String amount) {
+    this.amount = amount;
   }
 
   public String getFee() {
@@ -72,19 +84,67 @@ public class DataSendOrderResponse implements Serializable {
     this.fee = fee;
   }
 
-  public long getPaymentExpiredTime() {
-    return paymentExpiredTime;
+  public String getFeeRecipient() {
+    return feeRecipient;
   }
 
-  public void setPaymentExpiredTime(long paymentExpiredTime) {
-    this.paymentExpiredTime = paymentExpiredTime;
+  public void setFeeRecipient(String feeRecipient) {
+    this.feeRecipient = feeRecipient;
   }
 
-  public long getExpectedBlock() {
-    return expectedBlock;
+  public String getNonce() {
+    return nonce;
   }
 
-  public void setExpectedBlock(long expectedBlock) {
-    this.expectedBlock = expectedBlock;
+  public void setNonce(String nonce) {
+    this.nonce = nonce;
+  }
+
+  public String getTokenID() {
+    return tokenID;
+  }
+
+  public void setTokenID(String tokenID) {
+    this.tokenID = tokenID;
+  }
+
+  public String getChainType() {
+    return chainType;
+  }
+
+  public void setChainType(String chainType) {
+    this.chainType = chainType;
+  }
+
+  public String getChainID() {
+    return chainID;
+  }
+
+  public void setChainID(String chainID) {
+    this.chainID = chainID;
+  }
+
+  public String getData() {
+    return data;
+  }
+
+  public void setData(String data) {
+    this.data = data;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public String getSig() {
+    return sig;
+  }
+
+  public void setSig(String sig) {
+    this.sig = sig;
   }
 }

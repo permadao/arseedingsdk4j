@@ -1,15 +1,16 @@
 package com.github.permadao.arseedingsdk.sdk.request;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
-import com.github.permadao.arseedingsdk.sdk.model.AccountBalances;
-import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
-import com.github.permadao.arseedingsdk.sdk.model.PayTransaction;
-import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
+import com.github.permadao.arseedingsdk.sdk.model.*;
 import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.arseedingsdk.util.AssertUtils;
 import com.github.permadao.arseedingsdk.util.EverPayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,65 +21,62 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.permadao.model.constant.PayContant.*;
+import static com.github.permadao.model.constant.UrlPathContant.PAY_TX_PATH;
+import static com.github.permadao.model.constant.UrlPathContant.QUERY_BALANCES;
+
 /**
  * @author shiwen.wy
  * @date 2023/10/8 17:02
  */
 public class PayOrdersRequest {
 
-  private ArSeedingService arSeedingService;
+  private static final Logger log = LoggerFactory.getLogger(PayOrdersRequest.class);
 
-  private Wallet wallet;
+  private final ArSeedingService arSeedingService;
 
-  private Map<String, TokenInfo> tokens;
-  private String feeRecipient;
+  private final Wallet wallet;
 
-  protected final ObjectMapper objectMapper = new ObjectMapper();
+  private final Pay pay;
+
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   public PayOrdersRequest(
       ArSeedingService arSeedingService,
-      Wallet wallet,
-      Map<String, TokenInfo> tokens,
-      String feeRecipient) {
+      Wallet wallet, Pay pay) {
     this.arSeedingService = arSeedingService;
     this.wallet = wallet;
-    this.tokens = tokens;
-    this.feeRecipient = feeRecipient;
+    this.pay = pay;
   }
 
   public PayOrdersResponse send(List<PayOrder> orders) throws Exception {
 
     verifyOrders(orders);
 
-    if (orders.get(0).getFee().isEmpty()) {
-      return null; // arseeding NO_FEE module
+    if (StringUtils.isBlank(orders.get(0).getFee())) {
+      log.info("order fee is null");
+      return null;
     }
 
     BigDecimal totalFee = BigDecimal.ZERO;
     List<String> itemIds = new ArrayList<>();
-    for (PayOrder ord : orders) {
+    for (PayOrder order : orders) {
       try {
-        BigDecimal fee = new BigDecimal(ord.getFee());
-        totalFee = totalFee.add(fee);
+        totalFee = totalFee.add(new BigDecimal(order.getFee()));
       } catch (NumberFormatException e) {
         throw new IllegalArgumentException("order fee incorrect");
       }
-      itemIds.add(ord.getItemId());
+      itemIds.add(order.getItemId());
     }
 
-    Map<String, Object> payTxData = new HashMap<>();
-    payTxData.put("appName", "arseeding");
-    payTxData.put("action", "payment");
-    payTxData.put("itemIds", itemIds);
+    String dataJs = buildPayTxStr(itemIds);
 
-    String dataJs = objectMapper.writeValueAsString(payTxData);
-
-    List<String> tokenTags = symbolToTagArr(orders.get(0).getCurrency());
+    List<String> tokenTags = pay.symbolToTagArr(orders.get(0).getCurrency());
     if (tokenTags.isEmpty()) {
       throw new IllegalArgumentException("currency not exist token");
     }
 
-    List<AccountBalances.Balance> tokBals = getAccountBalances(wallet.getAddress()).getBalances();
+    List<AccountBalances.Balance> tokBals = pay.getAccountBalances(wallet.getAddress()).getBalances();
     Map<String, BigDecimal> tagToBal = new HashMap<>();
     for (AccountBalances.Balance bal : tokBals) {
       try {
@@ -96,28 +94,38 @@ public class PayOrdersRequest {
         useTag = tag;
       }
     }
-    if (useTag.isEmpty()) {
-      throw new IllegalArgumentException("token balance insufficient");
-    }
+    AssertUtils.notBlank(useTag, "token balance insufficient");
 
-    TokenInfo tokenInfo = tokens.get(useTag);
+    TokenInfo tokenInfo = pay.getTokens().get(useTag);
     AssertUtils.notNull(tokenInfo, "TokenInfo is null, useTag = " + useTag);
-    String action = "transfer";
+
     PayTransaction payTransaction =
-        buildPayTransaction(tokenInfo, action, totalFee, dataJs, orders.get(0).getBundler());
+        buildPayTransaction(tokenInfo, totalFee, dataJs, orders.get(0).getBundler());
 
     payTransaction.setSig(
         wallet.payTxSign(payTransaction.string().getBytes(StandardCharsets.UTF_8)));
+
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
-    InputStream inputStream = arSeedingService.sendJsonRequestToArSeeding("/tx", jsonStr, null);
+
+    InputStream inputStream =
+        arSeedingService.sendJsonRequestToArSeeding(PAY_TX_PATH, jsonStr, null);
 
     return objectMapper.readValue(inputStream, PayOrdersResponse.class);
   }
 
+  private String buildPayTxStr(List<String> itemIds) throws JsonProcessingException {
+    Map<String, Object> payTxData = new HashMap<>();
+    payTxData.put(APP_NAME_CODE, APP_NAME_VALUE);
+    payTxData.put(ACTION_CODE, ACTION_VALUE);
+    payTxData.put(PAY_ITEM_ID_LIST, itemIds);
+
+    return objectMapper.writeValueAsString(payTxData);
+  }
+
   private PayTransaction buildPayTransaction(
-      TokenInfo tokenInfo, String action, BigDecimal totalFee, String dataJs, String bundler) {
+      TokenInfo tokenInfo, BigDecimal totalFee, String dataJs, String bundler) {
     PayTransaction tx = new PayTransaction();
-    tx.setAction(action);
+    tx.setAction(PAY_ACTION);
     tx.setAmount(totalFee == null ? "0" : totalFee.toString());
     tx.setChainID(tokenInfo.getChainID());
     tx.setData(dataJs);
@@ -126,34 +134,15 @@ public class PayOrdersRequest {
     tx.setChainType(tokenInfo.getChainType());
     tx.setNonce(String.valueOf(EverPayUtils.getNonce()));
     tx.setTo(bundler);
-    tx.setFeeRecipient(feeRecipient);
+    tx.setFeeRecipient(pay.getFeeRecipient());
     tx.setTokenID(tokenInfo.getId());
     tx.setTokenSymbol(tokenInfo.getSymbol());
-    tx.setVersion("v1");
+    tx.setVersion(PAY_VERSION);
     return tx;
   }
 
-  private AccountBalances getAccountBalances(String address) throws IOException {
-    String pathName = String.format("/balances/%s", address);
-    String balancesStr = arSeedingService.sendPayRequest(pathName);
-    return objectMapper.readValue(balancesStr, AccountBalances.class);
-  }
-
-  public List<String> symbolToTagArr(String symbol) {
-    List<String> tagArr = new ArrayList<>();
-
-    for (Map.Entry<String, TokenInfo> entry : tokens.entrySet()) {
-      TokenInfo tok = entry.getValue();
-      if (tok.getSymbol().equalsIgnoreCase(symbol)) {
-        tagArr.add(entry.getKey());
-      }
-    }
-
-    return tagArr;
-  }
-
   private void verifyOrders(List<PayOrder> orders) {
-    if (orders.isEmpty()) {
+    if (orders == null || orders.isEmpty()) {
       throw new IllegalArgumentException("order is null");
     }
 
