@@ -11,6 +11,14 @@ public class Tag implements Serializable {
 
     private String value;
 
+    public Tag() {
+    }
+
+    public Tag(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     public String getName() {
         return name;
     }

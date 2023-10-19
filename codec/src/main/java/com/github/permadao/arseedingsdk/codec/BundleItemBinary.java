@@ -72,31 +72,40 @@ public class BundleItemBinary {
     currentIndex =
         appendArray(bytesArr, currentIndex, shortTo2ByteArray(bundleItem.getSignatureType()));
     currentIndex = appendArray(bytesArr, currentIndex, sig);
-    currentIndex = appendArray(bytesArr, currentIndex, ownerByte);
+    appendArray(bytesArr, currentIndex, ownerByte);
 
+    // 2 + sigLength + ownerLength has used, so use concat here
     if (StringUtils.isNotBlank(bundleItem.getTarget())) {
-      bytesArr[currentIndex++] = 1;
-      currentIndex = appendArray(bytesArr, currentIndex, targetBytes);
+      bytesArr = concatArrays(bytesArr, new byte[]{1});
+      bytesArr = concatArrays(bytesArr, targetBytes);
     } else {
-      bytesArr[currentIndex++] = 0;
+      bytesArr = concatArrays(bytesArr, new byte[]{0});
     }
 
     if (StringUtils.isNotBlank(bundleItem.getAnchor())) {
-      bytesArr[currentIndex++] = 1;
-      currentIndex = appendArray(bytesArr, currentIndex, anchorBytes);
+      bytesArr = concatArrays(bytesArr, new byte[]{1});
+      bytesArr = concatArrays(bytesArr, anchorBytes);
     } else {
-      bytesArr[currentIndex++] = 0;
+      bytesArr = concatArrays(bytesArr, new byte[]{0});
     }
 
-    currentIndex =
-        appendArray(bytesArr, currentIndex, longTo8ByteArray(bundleItem.getTags().size()));
-    currentIndex = appendArray(bytesArr, currentIndex, longTo8ByteArray(tagsBytes.length));
+    bytesArr = concatArrays(bytesArr,
+            longTo8ByteArray(bundleItem.getTags() == null ? 0 :
+                                     bundleItem.getTags().size()));
+    bytesArr = concatArrays(bytesArr, longTo8ByteArray(tagsBytes.length));
 
     if (bundleItem.getTags() != null && !bundleItem.getTags().isEmpty()) {
-      appendArray(bytesArr, currentIndex, tagsBytes);
+      bytesArr = concatArrays(bytesArr, tagsBytes);
     }
 
     return bytesArr;
+  }
+
+  private static byte[] concatArrays(byte[] array1, byte[] array2) {
+    byte[] result = new byte[array1.length + array2.length];
+    System.arraycopy(array1, 0, result, 0, array1.length);
+    System.arraycopy(array2, 0, result, array1.length, array2.length);
+    return result;
   }
 
   private static int appendArray(byte[] destination, int destPos, byte[] source) {

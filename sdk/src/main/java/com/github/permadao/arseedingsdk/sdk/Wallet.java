@@ -9,7 +9,7 @@ import com.github.permadao.model.wallet.SignTypeEnum;
 public interface Wallet {
   // 获取钱包地址
   String getAddress();
-
+  String getOwner();
   // 导出钱包私钥
   String exportPrivateKey();
 

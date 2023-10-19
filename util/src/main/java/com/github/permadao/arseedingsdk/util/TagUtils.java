@@ -20,13 +20,13 @@ import java.util.List;
 public class TagUtils {
 
   private static final String SCHEMA =
-      "{\"type\": \"array\", \"items\": {\"type\": \"record\", \"name\": \"Tag\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}]}}";
+      "{\"type\": \"record\", \"name\": \"Tag\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}]}";
 
   private static final String TAG_NAME = "name";
   private static final String TAG_VALUE = "value";
 
   public static byte[] serializeTags(List<Tag> tags) throws IOException {
-    if (tags.isEmpty()) {
+    if (tags == null || tags.isEmpty()) {
       return new byte[0];
     }
 
