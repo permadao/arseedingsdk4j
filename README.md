@@ -41,5 +41,125 @@ ArweaveWallet arweaveWallet =
 
 ### send data
 ```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
 
+    Tag tag = new Tag("abc", "abc");
+
+    DataSendResponse usdc =
+        arSDK.sendData("hello world".getBytes(), "usdc", Lists.newArrayList(tag), "", "", false);
+    
+    System.out.println(usdc);
+```
+### pay the order
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+
+    PayOrder payOrder = getPayOrder() // get the pay order
+    PayOrdersResponse response = arSDK.payOrders(Lists.newArrayList(payOrder))
+    
+    System.out.println(response);
+```
+### send and pay
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+
+    Tag tag = new Tag("abc", "abc");
+
+    DataSendOrderResponse response =
+        arSDK.sendDataAndPay("hello world".getBytes(), "usdc", Lists.newArrayList(tag), "", "", false);
+    
+    System.out.println(response);
+```
+### send data using API keys
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+
+    Map<String,String> tags = new HashMap<>();
+    tags.put("abc", "abc");
+    String itemId = arSDK.submitNativeData("your apiKey", "usdc", "hello world".getBytes(), "", tags);
+    
+    System.out.println(itemId);
+```
+
+### upload folder data
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+
+    ManifestUploadResponse response = arSDK.uploadFolder("your root path", batchSize, "index file", "usdc");
+    
+    System.out.println(response);
+```
+
+### get bundle fees
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+    
+    BundleFee fee = arSDK.bundleFee(size, "usdc");
+    
+    System.out.println(fee);
+```
+
+### get user orders
+```agsl
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    builder.build();
+    EthereumWallet ethereumWallet =
+        EthereumWallet.loadEthereumWallet(
+            "your private key");
+    ArSeedingService arSeedingService =
+        new HttpArSeedingService(
+            "https://seed-dev.everpay.io", "https://api-dev.everpay.io", builder.build());
+    ArSDK arSDK = ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
+    
+    List<BundleOrder> orders = arSDK.getOrders("your address", 1);
+    
+    System.out.println(orders);
 ```
