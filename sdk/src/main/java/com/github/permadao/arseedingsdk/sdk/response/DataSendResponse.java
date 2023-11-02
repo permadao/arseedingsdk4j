@@ -88,4 +88,12 @@ public class DataSendResponse implements Serializable {
   public void setExpectedBlock(long expectedBlock) {
     this.expectedBlock = expectedBlock;
   }
+
+  @Override public String toString() {
+    return "DataSendResponse{" + "itemId='" + itemId + '\'' + ", size=" + size
+                   + ", bundler='" + bundler + '\'' + ", currency='" + currency
+                   + '\'' + ", decimals=" + decimals + ", fee='" + fee + '\''
+                   + ", paymentExpiredTime=" + paymentExpiredTime
+                   + ", expectedBlock=" + expectedBlock + '}';
+  }
 }

@@ -3,6 +3,7 @@ package com.github.permadao.arseedingsdk.sdk.impl;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.permadao.arseedingsdk.codec.Base64Util;
 import com.github.permadao.arseedingsdk.util.HexEncoderUtils;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.model.wallet.SignTypeEnum;
@@ -57,7 +58,7 @@ public class EthereumWallet implements Wallet {
   }
 
   public static EthereumWallet loadEthereumWallet(String password, File source)
-      throws IOException, CipherException {
+      throws Exception {
     WalletFile walletFile = objectMapper.readValue(source, WalletFile.class);
     ECKeyPair ecKeyPair = decrypt(password, walletFile);
     String address = Numeric.prependHexPrefix(Keys.getAddress(ecKeyPair));
@@ -186,6 +187,11 @@ public class EthereumWallet implements Wallet {
   }
 
   @Override
+  public String getOwner() {
+    return Base64Util.base64Encode(ecKeyPair.getPublicKey().toByteArray());
+  }
+
+  @Override
   public String exportPrivateKey() {
     return Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKey());
   }
@@ -203,7 +209,21 @@ public class EthereumWallet implements Wallet {
   @Override
   public byte[] sign(byte[] msg) {
     Sign.SignatureData signatureData = Sign.signPrefixedMessage(msg, ecKeyPair);
-    return signatureData.getS();
+    return formatSignature(signatureData.getR(), signatureData.getS(),
+            (byte)((int)(signatureData.getV()[0]) - 27));
+  }
+
+  private byte[] formatSignature(byte[] r, byte[] s, byte v) {
+    if (r.length != 32 || s.length != 32 || (v != 0 && v != 1)) {
+      throw new IllegalArgumentException("Invalid input data");
+    }
+
+    byte[] signature = new byte[65];
+    System.arraycopy(r, 0, signature, 0, 32);
+    System.arraycopy(s, 0, signature, 32, 32);
+    signature[64] = v;
+
+    return signature;
   }
 
   @Override

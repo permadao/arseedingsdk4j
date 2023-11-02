@@ -59,6 +59,11 @@ public class ArweaveWallet implements Wallet {
   }
 
   @Override
+  public String getOwner() {
+    return null;
+  }
+
+  @Override
   public String exportPrivateKey() {
     PrivateKey privateKey = keyPair.getPrivate();
     byte[] privateKeyBytes = privateKey.getEncoded();

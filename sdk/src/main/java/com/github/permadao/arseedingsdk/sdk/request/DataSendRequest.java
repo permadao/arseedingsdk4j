@@ -80,7 +80,7 @@ public class DataSendRequest {
         builder
             .signatureType(wallet.signType().getValue())
             .signature(StringUtils.EMPTY)
-            .owner(wallet.getAddress())
+            .owner(wallet.getOwner())
             .target(target)
             .anchor(anchor)
             .tags(tags)

@@ -32,7 +32,7 @@ public class HttpArSeedingService implements ArSeedingService {
           MediaType.parse("application/json; charset=utf-8");
 
   public static final MediaType BYTE_MEDIA_TYPE =
-          MediaType.parse("application/octet-stream; charset=utf-8");
+          MediaType.parse("application/octet-stream");
 
   public HttpArSeedingService(String arSeedingHost, String payHost, OkHttpClient httpClient) {
     this.arSeedingHost = arSeedingHost;
