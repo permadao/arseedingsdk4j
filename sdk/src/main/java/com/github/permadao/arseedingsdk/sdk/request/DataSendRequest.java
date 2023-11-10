@@ -52,7 +52,7 @@ public class DataSendRequest {
     verifyBase64DecodeResult(target);
     verifyBase64DecodeResult(anchor);
 
-    byte[] tagsBytes = TagUtils.serializeTags(tags);
+    byte[] tagsBytes = TagUtils.serializeTagsList(tags);
 
     BundleItem bundleItem = buildBundleItem(target, anchor, tags, tagsBytes, data);
 

@@ -22,7 +22,7 @@ public class DataSendTest {
 		builder.build();
 		Wallet ethereumWallet =
 				EthereumWallet.loadEthereumWallet(
-						"your private key");
+						"1d8bdd0d2f1e73dffe1111111118325b7e195669541f76559760ef615a588be3");
 		ArSeedingService arSeedingService =
 				new HttpArSeedingService("https://seed-dev.everpay.io",
 						"https://api-dev.everpay.io",
