@@ -1,5 +1,6 @@
 package com.github.permadao.arseedingsdk.sdk.model;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 
@@ -23,8 +24,10 @@ public class Pay {
 
   public Pay(
       ArSeedingService arSeedingService, Map<String, TokenInfo> tokens, String feeRecipient) {
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     this.tokens = tokens;
     this.feeRecipient = feeRecipient;
+    this.arSeedingService = arSeedingService;
   }
 
   public AccountBalances getAccountBalances(String address) throws IOException {
