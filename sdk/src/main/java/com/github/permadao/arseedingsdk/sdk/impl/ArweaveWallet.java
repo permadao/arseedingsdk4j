@@ -4,14 +4,21 @@ import com.github.permadao.arseedingsdk.codec.Base64Util;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.util.SHA256Utils;
 import com.github.permadao.model.wallet.SignTypeEnum;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.web3j.crypto.Sign;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
+import java.security.spec.RSAPrivateCrtKeySpec;
+import java.util.Arrays;
 
 /**
  * @author shiwen.wy
@@ -20,54 +27,128 @@ import java.util.Base64;
 public class ArweaveWallet implements Wallet {
   private static final Logger log =
           LoggerFactory.getLogger(ArweaveWallet.class);
-  private final KeyPair keyPair;
+  private static final String SIGNATURE_ALGORITHM = "SHA256withRSA/PSS";
+  private static final int SIGNATURE_SALT_LENGTH = 32;
 
-  public ArweaveWallet(KeyPair keyPair) {
-    this.keyPair = keyPair;
+  private BigInteger n;
+  private int e;
+  private String address;
+  private PrivateKey privateKey;
+
+  public ArweaveWallet(BigInteger n, int e, String address,
+          PrivateKey privateKey) {
+    this.n = n;
+    this.e = e;
+    this.address = address;
+    this.privateKey = privateKey;
   }
 
-  public static ArweaveWallet loanArweaveWallet(String privateKey) {
-    return new ArweaveWallet(generateKeyPairFromPrivateKey(privateKey));
-  }
-
-  private static KeyPair generateKeyPairFromPrivateKey(String privateKeyBase64) {
+  public static ArweaveWallet loadArWallet(String filePath) throws Exception {
+    byte[] keyBytes = Files.readAllBytes(Paths.get(filePath));
+    Security.addProvider(new BouncyCastleProvider());
     try {
-      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyBase64);
+      String keyString = new String(keyBytes, StandardCharsets.UTF_8);
+      JSONObject jsonKey = new JSONObject(keyString);
 
-      PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+      String n = jsonKey.getString("n");
+      String e = jsonKey.getString("e");
+      String d = jsonKey.getString("d");
+
+      byte[] data = safeDecode(e);
+
+      if (data.length < 4) {
+        byte[] ndata = new byte[4];
+        System.arraycopy(data, 0, ndata, 4 - data.length, data.length);
+        data = ndata;
+      }
+      int publicKey_e = toInt(data);
+
+      data = safeDecode(n);
+
+      BigInteger publicKey_n = new BigInteger(1, data);
+
+      byte[] bytes = SHA256Utils.sha256(publicKey_n.toByteArray());
+      String address = Base64Util.base64Encode(bytes);
+
+      String p = jsonKey.getString("p");
+      String q = jsonKey.getString("q");
+      String dp = jsonKey.getString("dp");
+      String dq = jsonKey.getString("dq");
+      String qi = jsonKey.getString("qi");
+
+      BigInteger privateExponent =
+              new BigInteger(1, Base64Util.base64Decode(d));
+      BigInteger primeP = new BigInteger(1, Base64Util.base64Decode(p));
+      BigInteger primeQ = new BigInteger(1, Base64Util.base64Decode(q));
+      BigInteger primeExponentP =
+              new BigInteger(1, Base64Util.base64Decode(dp));
+      BigInteger primeExponentQ =
+              new BigInteger(1, Base64Util.base64Decode(dq));
+      BigInteger crtCoefficient =
+              new BigInteger(1, Base64Util.base64Decode(qi));
+
+      BigInteger modulus = new BigInteger(1, Base64Util.base64Decode(n));
+      BigInteger publicExponent =
+              new BigInteger(1, Base64Util.base64Decode(e));
+
+      RSAPrivateCrtKeySpec privateKeySpec =
+              new RSAPrivateCrtKeySpec(modulus, publicExponent,
+                      privateExponent, primeP, primeQ, primeExponentP,
+                      primeExponentQ, crtCoefficient);
+
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
+
       PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 
-      // Create a PublicKey from the PrivateKey (not secure for all cases)
-      // This is typically not recommended, but it's possible in some scenarios.
-      java.security.spec.X509EncodedKeySpec publicKeySpec =
-          new java.security.spec.X509EncodedKeySpec(privateKey.getEncoded());
-      PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-      return new KeyPair(publicKey, privateKey);
+      return new ArweaveWallet(publicKey_n, publicKey_e, address, privateKey);
     } catch (Exception e) {
-      e.printStackTrace();
-      return null;
+      throw new RuntimeException(e);
     }
+  }
+
+  private static int toInt(byte[] data) {
+    // Ensure that the byte array has at least 4 bytes
+    if (data.length < 4) {
+      throw new IllegalArgumentException(
+              "Byte array must have at least 4 bytes");
+    }
+
+    ByteBuffer buffer = ByteBuffer.wrap(data);
+    buffer.order(java.nio.ByteOrder.BIG_ENDIAN);
+
+    return buffer.getInt();
+  }
+
+  private static byte[] safeDecode(String str) {
+    int lenMod4 = str.length() % 4;
+    if (lenMod4 > 0) {
+      str = str + "====".substring(lenMod4);
+    }
+
+    return Base64Util.base64Decode(str);
   }
 
   @Override
   public String getAddress() {
-    PublicKey publicKey = keyPair.getPublic();
-    byte[] publicKeyBytes = publicKey.getEncoded();
-    return Base64.getEncoder().encodeToString(publicKeyBytes);
+    return address;
   }
 
   @Override
   public String getOwner() {
-    return null;
+    return Base64Util.base64Encode(removeFirstByte(n.toByteArray()));
+  }
+
+  private static byte[] removeFirstByte(byte[] input) {
+    if (input == null || input.length <= 1) {
+      return new byte[0];  // Return an empty array if the input is null or has only one byte
+    }
+
+    return Arrays.copyOfRange(input, 1, input.length);
   }
 
   @Override
   public String exportPrivateKey() {
-    PrivateKey privateKey = keyPair.getPrivate();
-    byte[] privateKeyBytes = privateKey.getEncoded();
-    return Base64.getEncoder().encodeToString(privateKeyBytes);
+    return null;
   }
 
   @Override
@@ -83,32 +164,27 @@ public class ArweaveWallet implements Wallet {
   @Override
   public byte[] sign(byte[] msg) {
     try {
-      Signature signature = Signature.getInstance("SHA256withRSA");
-      signature.initSign(keyPair.getPrivate());
+      Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM,
+              BouncyCastleProvider.PROVIDER_NAME);
+      PSSParameterSpec pssParameterSpec = new PSSParameterSpec(
+              MGF1ParameterSpec.SHA256.getDigestAlgorithm(), "MGF1",
+              MGF1ParameterSpec.SHA256, SIGNATURE_SALT_LENGTH, 1);
+      signature.setParameter(pssParameterSpec);
+      signature.initSign(privateKey);
       signature.update(msg);
       return signature.sign();
     } catch (Exception e) {
-      log.error("ArweaveWallet sign error", e);
+      throw new RuntimeException("Error signing message", e);
     }
-    return null;
   }
 
   @Override
   public String payTxSign(byte[] msg) {
-    byte[] textHash = Sign.getEthereumMessageHash(msg);
-    byte[] hashedMessage = SHA256Utils.sha256(textHash);
-
-    Signature signature = null;
     try {
-      signature = Signature.getInstance("SHA256withRSA");
-      signature.initSign(keyPair.getPrivate());
-      // 使用私钥对消息进行签名
-      signature.update(hashedMessage);
-      byte[] signatureBytes = signature.sign();
-      RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+      byte[] signatureBytes = sign(msg);
       return Base64Util.base64Encode(signatureBytes)
           + ","
-          + Base64Util.base64Encode(publicKey.getModulus().toByteArray());
+          + getOwner();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -21,7 +21,7 @@ public class DataSendTest {
 		OkHttpClient.Builder builder = new OkHttpClient.Builder();
 		builder.build();
 		Wallet ethereumWallet = EthereumWallet.loadEthereumWallet(
-				"1d8bdd0d2f1e73dffe1111111118325b7e195669541f76559760ef615a588be3");
+				"");
 		System.out.println(ethereumWallet.getAddress());
 		ArSeedingService arSeedingService =
 				new HttpArSeedingService("https://seed-dev.everpay.io",
