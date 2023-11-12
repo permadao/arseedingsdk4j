@@ -1,6 +1,7 @@
 package com.github.permadao.arseedingsdk.sdk.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
@@ -44,6 +45,7 @@ public class PayOrdersRequest {
   public PayOrdersRequest(
       ArSeedingService arSeedingService,
       Wallet wallet, Pay pay) {
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     this.arSeedingService = arSeedingService;
     this.wallet = wallet;
     this.pay = pay;

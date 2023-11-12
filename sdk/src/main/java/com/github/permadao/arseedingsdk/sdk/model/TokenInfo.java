@@ -48,7 +48,7 @@ public class TokenInfo implements Serializable {
   @JsonProperty("crossChainInfoList")
   private Map<String, TargetChain> crossChainInfoList;
 
-  public class TargetChain {
+  public static class TargetChain {
     @JsonProperty("targetChainId")
     private String chainId;
 

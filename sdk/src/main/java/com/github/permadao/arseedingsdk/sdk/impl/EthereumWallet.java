@@ -188,9 +188,15 @@ public class EthereumWallet implements Wallet {
 
   @Override
   public String getOwner() {
-    byte[] publicKey = ecKeyPair.getPublicKey().toByteArray();
-    publicKey[0] = 0x04;
-    return Base64Util.base64Encode(publicKey);
+    byte[] byteArray = ecKeyPair.getPublicKey().toByteArray();
+    if (byteArray.length == 64) {
+      byte[] bytes = new byte[65];
+      bytes[0] = (byte)4;
+      System.arraycopy(byteArray, 0, bytes, 1, 64);
+      return Base64Util.base64Encode(bytes);
+    }
+    byteArray[0] = 0x04;
+    return Base64Util.base64Encode(byteArray);
   }
 
   @Override

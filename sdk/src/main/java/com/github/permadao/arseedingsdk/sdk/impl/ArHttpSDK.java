@@ -1,5 +1,6 @@
 package com.github.permadao.arseedingsdk.sdk.impl;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.permadao.arseedingsdk.sdk.model.TokenInfo;
 import com.github.permadao.arseedingsdk.sdk.request.DataSendRequest;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
@@ -51,6 +52,7 @@ public class ArHttpSDK implements ArSDK {
     this.wallet = wallet;
     try {
       String payInfoStr = arSeedingService.sendPayRequest(PAY_INFO_PATH);
+      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       PayInfo payInfo = objectMapper.readValue(payInfoStr, PayInfo.class);
       Map<String, TokenInfo> tokens = new HashMap<>();
       for (TokenInfo t : payInfo.getTokenList()) {

@@ -14,7 +14,7 @@ public class AccountBalances implements Serializable {
 
   private List<Balance> balances;
 
-  public class Balance {
+  public static class Balance {
 
     private String tag;
 
