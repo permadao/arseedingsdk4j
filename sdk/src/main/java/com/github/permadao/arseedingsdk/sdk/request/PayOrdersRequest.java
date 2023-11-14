@@ -89,7 +89,7 @@ public class PayOrdersRequest {
       }
     }
 
-    String useTag = "";
+    String useTag = "bsc-tusdc-0xf17a50ecc5fe5f476de2da5481cdd0f0ffef7712";
     for (String tag : tokenTags) {
       BigDecimal amt = tagToBal.get(tag);
       if (amt != null && amt.compareTo(totalFee) >= 0) {
@@ -110,9 +110,15 @@ public class PayOrdersRequest {
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
 
     InputStream inputStream =
-        arSeedingService.sendJsonRequestToArSeeding(PAY_TX_PATH, jsonStr, null);
+        arSeedingService.sendJsonRequestToArSeeding(PAY_TX_PATH, jsonStr, buildHeaders());
 
     return objectMapper.readValue(inputStream, PayOrdersResponse.class);
+  }
+
+  private HashMap<String, String> buildHeaders() {
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("Content-Type", "application/json");
+    return headers;
   }
 
   private String buildPayTxStr(List<String> itemIds) throws JsonProcessingException {

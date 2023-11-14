@@ -236,6 +236,6 @@ public class EthereumWallet implements Wallet {
 
   @Override
   public String payTxSign(byte[] msg) {
-    return HexEncoderUtils.encode(sign(msg));
+    return Numeric.toHexString(sign(msg));
   }
 }

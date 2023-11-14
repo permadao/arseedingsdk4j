@@ -15,14 +15,14 @@ public class ManifestTest {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.build();
         Wallet ethereumWallet = EthereumWallet.loadEthereumWallet(
-                "cwtech78c954d792251666305c59526a71cb6eb70052cfb09556432fcf01eff838b0");
+                "");
         System.out.println(ethereumWallet.getAddress());
         ArSeedingService arSeedingService =
                 new HttpArSeedingService("https://seed-dev.everpay.io",
                         "https://api-dev.everpay.io", builder.build());
         ArSDK arSDK =
                 ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
-        UploadFolderAndPayResponse response = arSDK.uploadFolderAndPay(testDir, 2, "index.html", "usdt");
+        UploadFolderAndPayResponse response = arSDK.uploadFolderAndPay(testDir, 2, "index.html", "usdc");
 
         System.out.println(response);
     }
