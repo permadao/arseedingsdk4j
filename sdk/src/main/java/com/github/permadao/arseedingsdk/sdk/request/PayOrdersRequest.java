@@ -107,7 +107,7 @@ public class PayOrdersRequest {
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
 
     InputStream inputStream =
-        arSeedingService.sendJsonRequestToEverPay(PAY_TX_PATH, jsonStr, buildHeaders());
+        arSeedingService.sendJsonRequestToEverPay(PAY_TX_PATH, jsonStr, null);
 
     return objectMapper.readValue(inputStream, PayOrdersResponse.class);
   }

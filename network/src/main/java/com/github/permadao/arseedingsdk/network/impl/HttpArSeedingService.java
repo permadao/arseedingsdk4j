@@ -52,6 +52,16 @@ public class HttpArSeedingService implements ArSeedingService {
   }
 
   @Override
+  public InputStream sendJsonRequestToEverPay(String path, String request,
+          HashMap<String, String> headers) throws IOException {
+    RequestBody requestBody = RequestBody.create(request, JSON_MEDIA_TYPE);
+
+    byte[] res = send(headers, payHost + path, requestBody);
+
+    return res == null ? null : new ByteArrayInputStream(res);
+  }
+
+  @Override
   public InputStream sendBytesRequestToArSeeding(
       String path, byte[] request, HashMap<String, String> headers) throws IOException {
 
@@ -108,6 +118,9 @@ public class HttpArSeedingService implements ArSeedingService {
 
   private byte[] send(HashMap<String, String> headers, String url, RequestBody requestBody)
           throws IOException {
+    if (headers == null) {
+      headers = new HashMap<>();
+    }
     Headers httpHeaders = Headers.of(headers);
     okhttp3.Request httpRequest =
             new okhttp3.Request.Builder().url(url).headers(httpHeaders).post(requestBody).build();

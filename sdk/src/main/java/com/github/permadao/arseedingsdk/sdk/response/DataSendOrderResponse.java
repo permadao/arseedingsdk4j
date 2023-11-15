@@ -7,144 +7,168 @@ import java.io.Serializable;
  * @date 2023/10/1 22:07
  */
 public class DataSendOrderResponse implements Serializable {
-  private static final long serialVersionUID = -1764467976694511595L;
-  private String tokenSymbol;
+	private static final long serialVersionUID = -1764467976694511595L;
 
-  private String action;
+	private String status;
+	private String tokenSymbol;
 
-  private String from;
+	private String action;
 
-  private String to;
+	private String from;
 
-  private String amount;
+	private String to;
 
-  private String fee;
+	private String amount;
 
-  private String feeRecipient;
+	private String fee;
 
-  private String nonce;
+	private String feeRecipient;
 
-  private String tokenID;
+	private String nonce;
 
-  private String chainType;
+	private String tokenID;
 
-  private String chainID;
+	private String chainType;
 
-  private String data;
+	private String chainID;
 
-  private String version;
+	private String data;
 
-  private String sig;
+	private String version;
 
-  public String getTokenSymbol() {
-    return tokenSymbol;
-  }
+	private String sig;
 
-  public void setTokenSymbol(String tokenSymbol) {
-    this.tokenSymbol = tokenSymbol;
-  }
+	public String getTokenSymbol() {
+		return tokenSymbol;
+	}
 
-  public String getAction() {
-    return action;
-  }
+	public void setTokenSymbol(String tokenSymbol) {
+		this.tokenSymbol = tokenSymbol;
+	}
 
-  public void setAction(String action) {
-    this.action = action;
-  }
+	public String getAction() {
+		return action;
+	}
 
-  public String getFrom() {
-    return from;
-  }
+	public void setAction(String action) {
+		this.action = action;
+	}
 
-  public void setFrom(String from) {
-    this.from = from;
-  }
+	public String getFrom() {
+		return from;
+	}
 
-  public String getTo() {
-    return to;
-  }
+	public void setFrom(String from) {
+		this.from = from;
+	}
 
-  public void setTo(String to) {
-    this.to = to;
-  }
+	public String getTo() {
+		return to;
+	}
 
-  public String getAmount() {
-    return amount;
-  }
+	public void setTo(String to) {
+		this.to = to;
+	}
 
-  public void setAmount(String amount) {
-    this.amount = amount;
-  }
+	public String getAmount() {
+		return amount;
+	}
 
-  public String getFee() {
-    return fee;
-  }
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
 
-  public void setFee(String fee) {
-    this.fee = fee;
-  }
+	public String getFee() {
+		return fee;
+	}
 
-  public String getFeeRecipient() {
-    return feeRecipient;
-  }
+	public void setFee(String fee) {
+		this.fee = fee;
+	}
 
-  public void setFeeRecipient(String feeRecipient) {
-    this.feeRecipient = feeRecipient;
-  }
+	public String getFeeRecipient() {
+		return feeRecipient;
+	}
 
-  public String getNonce() {
-    return nonce;
-  }
+	public void setFeeRecipient(String feeRecipient) {
+		this.feeRecipient = feeRecipient;
+	}
 
-  public void setNonce(String nonce) {
-    this.nonce = nonce;
-  }
+	public String getNonce() {
+		return nonce;
+	}
 
-  public String getTokenID() {
-    return tokenID;
-  }
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
+	}
 
-  public void setTokenID(String tokenID) {
-    this.tokenID = tokenID;
-  }
+	public String getTokenID() {
+		return tokenID;
+	}
 
-  public String getChainType() {
-    return chainType;
-  }
+	public void setTokenID(String tokenID) {
+		this.tokenID = tokenID;
+	}
 
-  public void setChainType(String chainType) {
-    this.chainType = chainType;
-  }
+	public String getChainType() {
+		return chainType;
+	}
 
-  public String getChainID() {
-    return chainID;
-  }
+	public void setChainType(String chainType) {
+		this.chainType = chainType;
+	}
 
-  public void setChainID(String chainID) {
-    this.chainID = chainID;
-  }
+	public String getChainID() {
+		return chainID;
+	}
 
-  public String getData() {
-    return data;
-  }
+	public void setChainID(String chainID) {
+		this.chainID = chainID;
+	}
 
-  public void setData(String data) {
-    this.data = data;
-  }
+	public String getData() {
+		return data;
+	}
 
-  public String getVersion() {
-    return version;
-  }
+	public void setData(String data) {
+		this.data = data;
+	}
 
-  public void setVersion(String version) {
-    this.version = version;
-  }
+	public String getVersion() {
+		return version;
+	}
 
-  public String getSig() {
-    return sig;
-  }
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-  public void setSig(String sig) {
-    this.sig = sig;
-  }
+	public String getSig() {
+		return sig;
+	}
+
+	public void setSig(String sig) {
+		this.sig = sig;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "DataSendOrderResponse{" + "status='" + status + '\''
+					   + ", tokenSymbol='" + tokenSymbol + '\'' + ", action='"
+					   + action + '\'' + ", from='" + from + '\'' + ", to='"
+					   + to + '\'' + ", amount='" + amount + '\'' + ", fee='"
+					   + fee + '\'' + ", feeRecipient='" + feeRecipient + '\''
+					   + ", nonce='" + nonce + '\'' + ", tokenID='" + tokenID
+					   + '\'' + ", chainType='" + chainType + '\''
+					   + ", chainID='" + chainID + '\'' + ", data='" + data
+					   + '\'' + ", version='" + version + '\'' + ", sig='" + sig
+					   + '\'' + '}';
+	}
 }
