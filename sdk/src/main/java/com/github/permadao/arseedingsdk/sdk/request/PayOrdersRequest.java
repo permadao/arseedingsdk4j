@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.permadao.model.constant.PayContant.*;
 import static com.github.permadao.model.constant.UrlPathContant.PAY_TX_PATH;
@@ -110,7 +107,7 @@ public class PayOrdersRequest {
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
 
     InputStream inputStream =
-        arSeedingService.sendJsonRequestToArSeeding(PAY_TX_PATH, jsonStr, buildHeaders());
+        arSeedingService.sendJsonRequestToEverPay(PAY_TX_PATH, jsonStr, buildHeaders());
 
     return objectMapper.readValue(inputStream, PayOrdersResponse.class);
   }
@@ -122,7 +119,7 @@ public class PayOrdersRequest {
   }
 
   private String buildPayTxStr(List<String> itemIds) throws JsonProcessingException {
-    Map<String, Object> payTxData = new HashMap<>();
+    Map<String, Object> payTxData = new LinkedHashMap<>();
     payTxData.put(APP_NAME_CODE, APP_NAME_VALUE);
     payTxData.put(ACTION_CODE, ACTION_VALUE);
     payTxData.put(PAY_ITEM_ID_LIST, itemIds);

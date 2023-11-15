@@ -81,6 +81,15 @@ public class HttpArSeedingService implements ArSeedingService {
   }
 
   @Override
+  public InputStream sendJsonRequestToEverPay(String path, String request, HashMap<String, String> headers) throws IOException {
+    RequestBody requestBody = RequestBody.create(request, JSON_MEDIA_TYPE);
+
+    byte[] res = send(headers, payHost + path, requestBody);
+
+    return res == null ? null : new ByteArrayInputStream(res);
+  }
+
+  @Override
   public String sendPayRequest(String path) throws IOException {
     Request request =
         new Request.Builder()

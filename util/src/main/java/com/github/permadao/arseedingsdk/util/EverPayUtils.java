@@ -8,7 +8,7 @@ public class EverPayUtils {
     private static long lastNonce = 0;
     public static synchronized long getNonce() {
         while (true) {
-            long newNonce = System.nanoTime() / 1000000;
+            long newNonce = System.currentTimeMillis();
             if (newNonce > lastNonce) {
                 lastNonce = newNonce;
                 return newNonce;
