@@ -13,8 +13,12 @@ public interface ArSeedingService {
     InputStream sendJsonRequestToArSeeding(String path, String request,
         HashMap<String, String> headers) throws IOException;
 
+    InputStream sendJsonRequestToEverPay(String path, String request,
+            HashMap<String, String> headers) throws IOException;
+
     InputStream sendBytesRequestToArSeeding(String path, byte[] request,
         HashMap<String, String> headers) throws IOException;
+
     InputStream sendGetRequestToArSeeding(String path, HashMap<String, String> headers) throws IOException;
 
 

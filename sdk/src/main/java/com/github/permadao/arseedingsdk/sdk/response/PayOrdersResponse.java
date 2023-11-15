@@ -8,6 +8,9 @@ import java.io.Serializable;
  */
 public class PayOrdersResponse implements Serializable {
   private static final long serialVersionUID = 8107322905600585006L;
+
+  private String status;
+
   private String tokenSymbol;
 
   private String action;
@@ -35,6 +38,14 @@ public class PayOrdersResponse implements Serializable {
   private String version;
 
   private String sig;
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
   public String getTokenSymbol() {
     return tokenSymbol;

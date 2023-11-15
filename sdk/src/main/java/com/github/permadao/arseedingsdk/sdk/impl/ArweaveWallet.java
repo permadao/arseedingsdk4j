@@ -67,7 +67,7 @@ public class ArweaveWallet implements Wallet {
 
       BigInteger publicKey_n = new BigInteger(1, data);
 
-      byte[] bytes = SHA256Utils.sha256(publicKey_n.toByteArray());
+      byte[] bytes = SHA256Utils.sha256(removeFirstByte(publicKey_n.toByteArray()));
       String address = Base64Util.base64Encode(bytes);
 
       String p = jsonKey.getString("p");
@@ -148,12 +148,12 @@ public class ArweaveWallet implements Wallet {
 
   @Override
   public String exportPrivateKey() {
-    return null;
+    return Base64Util.base64Encode(privateKey.getEncoded());
   }
 
   @Override
   public String exportPublicKey() {
-    return getAddress();
+    return n.toString(16);
   }
 
   @Override
@@ -181,7 +181,7 @@ public class ArweaveWallet implements Wallet {
   @Override
   public String payTxSign(byte[] msg) {
     try {
-      byte[] signatureBytes = sign(msg);
+      byte[] signatureBytes = sign(SHA256Utils.sha256(msg));
       return Base64Util.base64Encode(signatureBytes)
           + ","
           + getOwner();
