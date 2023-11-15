@@ -180,4 +180,9 @@ public class PayTransaction implements Serializable {
         "data:" + data + "\n" +
         "version:" + version;
   }
+
+  @Override
+  public String toString() {
+    return string();
+  }
 }

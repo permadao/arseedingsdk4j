@@ -21,8 +21,6 @@ public interface ArSeedingService {
 
     InputStream sendGetRequestToArSeeding(String path, HashMap<String, String> headers) throws IOException;
 
-    InputStream sendJsonRequestToEverPay(String path, String request,
-                                           HashMap<String, String> headers) throws IOException;
 
 
     String sendPayRequest(String path) throws IOException;

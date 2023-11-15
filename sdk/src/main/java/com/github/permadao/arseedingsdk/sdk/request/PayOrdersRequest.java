@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.network.ArSeedingService;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.sdk.model.*;
+import com.github.permadao.arseedingsdk.sdk.model.exception.BizException;
 import com.github.permadao.arseedingsdk.sdk.response.PayOrdersResponse;
 import com.github.permadao.arseedingsdk.util.AssertUtils;
 import com.github.permadao.arseedingsdk.util.EverPayUtils;
@@ -13,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +21,6 @@ import java.util.*;
 
 import static com.github.permadao.model.constant.PayContant.*;
 import static com.github.permadao.model.constant.UrlPathContant.PAY_TX_PATH;
-import static com.github.permadao.model.constant.UrlPathContant.QUERY_BALANCES;
 
 /**
  * @author shiwen.wy
@@ -86,7 +85,7 @@ public class PayOrdersRequest {
       }
     }
 
-    String useTag = "bsc-tusdc-0xf17a50ecc5fe5f476de2da5481cdd0f0ffef7712";
+    String useTag = "";
     for (String tag : tokenTags) {
       BigDecimal amt = tagToBal.get(tag);
       if (amt != null && amt.compareTo(totalFee) >= 0) {
@@ -108,14 +107,11 @@ public class PayOrdersRequest {
 
     InputStream inputStream =
         arSeedingService.sendJsonRequestToEverPay(PAY_TX_PATH, jsonStr, null);
-
-    return objectMapper.readValue(inputStream, PayOrdersResponse.class);
-  }
-
-  private HashMap<String, String> buildHeaders() {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("Content-Type", "application/json");
-    return headers;
+    PayOrdersResponse payOrdersResponse = objectMapper.readValue(inputStream, PayOrdersResponse.class);
+    if ("ok".equalsIgnoreCase(payOrdersResponse.getStatus())){
+      return payOrdersResponse;
+    }
+    throw new BizException(String.format("Fail to pay order,the return status is %s ",payOrdersResponse.getStatus()));
   }
 
   private String buildPayTxStr(List<String> itemIds) throws JsonProcessingException {
