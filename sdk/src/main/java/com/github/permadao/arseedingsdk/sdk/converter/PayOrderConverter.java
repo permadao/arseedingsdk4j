@@ -34,6 +34,7 @@ public class PayOrderConverter {
       return null;
     }
     DataSendOrderResponse dataSendOrderResponse = new DataSendOrderResponse();
+    dataSendOrderResponse.setStatus(payOrdersResponse.getStatus());
     dataSendOrderResponse.setData(payOrdersResponse.getData());
     dataSendOrderResponse.setAction(payOrdersResponse.getAction());
     dataSendOrderResponse.setAmount(payOrdersResponse.getAmount());

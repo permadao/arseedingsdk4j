@@ -166,18 +166,18 @@ public class PayTransaction implements Serializable {
   }
 
   public String string() {
-    return "tokenSymbol: " + tokenSymbol + "\n" +
-        "action: " + action + "\n" +
-        "from: " + from + "\n" +
-        "to: " + to + "\n" +
-        "amount: " + amount + "\n" +
-        "fee: " + fee + "\n" +
-        "feeRecipient: " + feeRecipient + "\n" +
-        "nonce: " + nonce + "\n" +
-        "tokenID: " + tokenID + "\n" +
-        "chainType: " + chainType + "\n" +
-        "chainID: " + chainID + "\n" +
-        "data: " + data + "\n" +
-        "version: " + version;
+    return "tokenSymbol:" + tokenSymbol + "\n" +
+        "action:" + action + "\n" +
+        "from:" + from + "\n" +
+        "to:" + to + "\n" +
+        "amount:" + amount + "\n" +
+        "fee:" + fee + "\n" +
+        "feeRecipient:" + feeRecipient + "\n" +
+        "nonce:" + nonce + "\n" +
+        "tokenID:" + tokenID + "\n" +
+        "chainType:" + chainType + "\n" +
+        "chainID:" + chainID + "\n" +
+        "data:" + data + "\n" +
+        "version:" + version;
   }
 }

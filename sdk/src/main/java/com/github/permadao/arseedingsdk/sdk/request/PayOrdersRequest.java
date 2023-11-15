@@ -110,7 +110,7 @@ public class PayOrdersRequest {
     String jsonStr = objectMapper.writeValueAsString(payTransaction);
 
     InputStream inputStream =
-        arSeedingService.sendJsonRequestToArSeeding(PAY_TX_PATH, jsonStr, null);
+        arSeedingService.sendJsonRequestToEverPay(PAY_TX_PATH, jsonStr, null);
 
     return objectMapper.readValue(inputStream, PayOrdersResponse.class);
   }
