@@ -34,4 +34,12 @@ public class ManifestUploadResponse implements Serializable {
   public void setItemId(String itemId) {
     this.itemId = itemId;
   }
+
+  @Override
+  public String toString() {
+    return "ManifestUploadResponse{" +
+            "orders=" + orders +
+            ", itemId='" + itemId + '\'' +
+            '}';
+  }
 }

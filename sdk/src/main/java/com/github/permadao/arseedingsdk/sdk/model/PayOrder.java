@@ -88,4 +88,18 @@ public class PayOrder implements Serializable {
   public void setExpectedBlock(long expectedBlock) {
     this.expectedBlock = expectedBlock;
   }
+
+  @Override
+  public String toString() {
+    return "PayOrder{" +
+            "itemId='" + itemId + '\'' +
+            ", size=" + size +
+            ", bundler='" + bundler + '\'' +
+            ", currency='" + currency + '\'' +
+            ", decimals=" + decimals +
+            ", fee='" + fee + '\'' +
+            ", paymentExpiredTime=" + paymentExpiredTime +
+            ", expectedBlock=" + expectedBlock +
+            '}';
+  }
 }

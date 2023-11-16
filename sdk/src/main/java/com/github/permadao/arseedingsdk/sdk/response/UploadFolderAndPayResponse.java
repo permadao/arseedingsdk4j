@@ -35,4 +35,12 @@ public class UploadFolderAndPayResponse implements Serializable {
   public void setEverTxs(List<PayTransaction> everTxs) {
     this.everTxs = everTxs;
   }
+
+  @Override
+  public String toString() {
+    return "UploadFolderAndPayResponse{" +
+            "manifestUploadResponse=" + manifestUploadResponse +
+            ", everTxs=" + everTxs +
+            '}';
+  }
 }

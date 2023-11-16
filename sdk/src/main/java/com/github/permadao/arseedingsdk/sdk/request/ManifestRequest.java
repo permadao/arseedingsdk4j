@@ -5,6 +5,7 @@ import com.github.permadao.arseedingsdk.sdk.converter.PayOrderConverter;
 import com.github.permadao.arseedingsdk.sdk.impl.ArHttpSDK;
 import com.github.permadao.arseedingsdk.sdk.model.PayOrder;
 import com.github.permadao.arseedingsdk.sdk.model.PayTransaction;
+import com.github.permadao.arseedingsdk.sdk.model.exception.BizException;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
 import com.github.permadao.arseedingsdk.sdk.response.ManifestUploadResponse;
 import com.github.permadao.arseedingsdk.sdk.response.UploadFolderAndPayResponse;
@@ -79,9 +80,9 @@ public class ManifestRequest {
         List<String> pathFiles = getPathFiles(rootPath);
 
         CopyOnWriteArrayList<PayOrder> orders = new CopyOnWriteArrayList<>();
-        for (String pathFile : pathFiles) {
-            runDataSendThread(pathFile, currency, needSequence, manifestData, orders, pathFiles.size(), batchSize);
-        }
+
+        runDataSendThread(pathFiles, currency, needSequence, manifestData, orders, pathFiles.size(), batchSize);
+
         byte[] manifestBytes = objectMapper.writeValueAsBytes(manifestData);
 
         DataSendResponse order =
@@ -116,37 +117,51 @@ public class ManifestRequest {
     }
 
     private void runDataSendThread(
-            String pathFile,
+            List<String> pathFiles,
             String currency,
             boolean needSequence,
             ManifestData manifestData,
             CopyOnWriteArrayList<PayOrder> orders,
             int pathFilesSize,
-            int batchSize) throws InterruptedException {
+            int batchSize) throws Exception {
         ExecutorService threadPool = Executors.newFixedThreadPool(batchSize);
         CountDownLatch countDownLatch = new CountDownLatch(pathFilesSize);
-        threadPool.submit(
-                () -> {
-                    try {
-                        byte[] bytes = readFileData(pathFile);
-                        Tag tag = new Tag();
-                        tag.setName("Content-Type");
-                        tag.setValue(Files.probeContentType(Paths.get(pathFile)));
-                        DataSendResponse order =
-                                arHttpSDK.sendData(
-                                        bytes, currency, Lists.newArrayList(tag), "", "", needSequence);
-                        orders.add(PayOrderConverter.dataSendResponseConvertToPayOrder(order));
-                        manifestData.getPaths().put(pathFile, new ManifestData.Resource(order.getItemId()));
-                        countDownLatch.countDown();
-                    } catch (Exception e) {
-                        log.error(
-                                String.format(
-                                        "ERROR:An exception occurred during uploading file [%s],the exception's details are  ",
-                                        pathFile),
-                                e);
-                    }
-                });
-        countDownLatch.await();
+        for (String pathFile : pathFiles) {
+            try {
+                threadPool.execute(
+                        () -> {
+                            try {
+                                byte[] bytes = readFileData(pathFile);
+                                Tag tag = new Tag();
+                                tag.setName("Content-Type");
+                                tag.setValue(Files.probeContentType(Paths.get(pathFile)));
+                                DataSendResponse order =
+                                        arHttpSDK.sendData(
+                                                bytes, currency, Lists.newArrayList(tag), "", "", needSequence);
+                                orders.add(PayOrderConverter.dataSendResponseConvertToPayOrder(order));
+                                manifestData.getPaths().put(pathFile, new ManifestData.Resource(order.getItemId()));
+                            } catch (Exception e) {
+                                log.error("ERROR: ", e);
+                                throw new BizException(e.getMessage());
+                            } finally {
+                                countDownLatch.countDown();
+                            }
+                        });
+            } catch (Throwable e) {
+                log.error(
+                        String.format(
+                                "ERROR:An exception occurred during uploading file [%s],the exception's details are  ",
+                                pathFile),
+                        e);
+                threadPool.shutdownNow();
+                throw e;
+            }
+        }
+        if (!countDownLatch.await(10, TimeUnit.MINUTES)) {
+            threadPool.shutdownNow();
+            throw new BizException("Upload Timeout!");
+        }
+        threadPool.shutdown();
     }
 
     private List<Tag> buildManifestTags() {
