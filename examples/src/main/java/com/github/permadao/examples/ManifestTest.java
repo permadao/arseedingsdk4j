@@ -15,7 +15,7 @@ public class ManifestTest {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.build();
         Wallet ethereumWallet = EthereumWallet.loadEthereumWallet(
-                "");
+                "your private key");
         System.out.println(ethereumWallet.getAddress());
         ArSeedingService arSeedingService =
                 new HttpArSeedingService("https://seed-dev.everpay.io",

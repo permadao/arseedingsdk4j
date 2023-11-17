@@ -20,8 +20,6 @@ public class WalletTest {
     EthereumWallet ethereumWallet =
         EthereumWallet.loadEthereumWallet("your password", new File(fileName));
     System.out.println(ethereumWallet.getAddress());
-    System.out.println(ethereumWallet.exportPrivateKey());
-    System.out.println(ethereumWallet.exportPublicKey());
   }
 
   private static void test1() {
@@ -29,7 +27,5 @@ public class WalletTest {
         EthereumWallet.loadEthereumWallet(
             "your private key");
     System.out.println(ethereumWallet.getAddress());
-    System.out.println(ethereumWallet.exportPrivateKey());
-    System.out.println(ethereumWallet.exportPublicKey());
   }
 }

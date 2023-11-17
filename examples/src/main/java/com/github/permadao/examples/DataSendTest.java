@@ -7,10 +7,8 @@ import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.arseedingsdk.sdk.impl.ArHttpSDK;
 import com.github.permadao.arseedingsdk.sdk.impl.EthereumWallet;
 import com.github.permadao.arseedingsdk.sdk.response.DataSendOrderResponse;
-import com.github.permadao.arseedingsdk.sdk.response.DataSendResponse;
 import com.github.permadao.model.bundle.Tag;
 import com.google.common.collect.Lists;
-import okhttp3.OkHttpClient;
 
 /**
  * @author shiwen.wy
@@ -18,14 +16,12 @@ import okhttp3.OkHttpClient;
  */
 public class DataSendTest {
 	public static void main(String[] args) throws Exception {
-		OkHttpClient.Builder builder = new OkHttpClient.Builder();
-		builder.build();
 		Wallet ethereumWallet = EthereumWallet.loadEthereumWallet(
-				"");
+				"your private key");
 		System.out.println(ethereumWallet.getAddress());
 		ArSeedingService arSeedingService =
 				new HttpArSeedingService("https://seed-dev.everpay.io",
-						"https://api-dev.everpay.io", builder.build());
+						"https://api-dev.everpay.io");
 		ArSDK arSDK =
 				ArHttpSDK.buildArHttpSDK(arSeedingService, ethereumWallet);
 

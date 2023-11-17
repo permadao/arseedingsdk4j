@@ -36,7 +36,7 @@ EthereumWallet ethereumWallet2 =
 ArweaveWallet
 ```agsl
 ArweaveWallet arweaveWallet = 
-        ArweaveWallet.loanArweaveWallet("your private key");
+        ArweaveWallet.loadArWallet("your file path");
 ```
 
 ### send data

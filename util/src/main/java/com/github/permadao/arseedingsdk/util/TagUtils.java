@@ -27,32 +27,6 @@ public class TagUtils {
   private static final String TAG_NAME = "name";
   private static final String TAG_VALUE = "value";
 
-  public static byte[] serializeTags(List<Tag> tags) throws IOException {
-    if (tags == null || tags.isEmpty()) {
-      return new byte[0];
-    }
-
-    // Define Avro schema
-    Schema schema = new Schema.Parser().parse(SCHEMA);
-
-    // Serialize Avro records to byte array
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
-    DatumWriter<GenericRecord> datumWriter =
-        new org.apache.avro.generic.GenericDatumWriter<>(schema);
-
-    for (Tag tag : tags) {
-      GenericRecord avroRecord = new GenericData.Record(schema);
-      avroRecord.put(TAG_NAME, tag.getName());
-      avroRecord.put(TAG_VALUE, tag.getValue());
-      datumWriter.write(avroRecord, encoder);
-    }
-    encoder.flush();
-    byteArrayOutputStream.close();
-
-    return byteArrayOutputStream.toByteArray();
-  }
-
   public static byte[] serializeTagsList(List<Tag> tags) throws IOException {
     if (tags == null || tags.isEmpty()) {
       return new byte[0];

@@ -147,16 +147,6 @@ public class ArweaveWallet implements Wallet {
   }
 
   @Override
-  public String exportPrivateKey() {
-    return Base64Util.base64Encode(privateKey.getEncoded());
-  }
-
-  @Override
-  public String exportPublicKey() {
-    return n.toString(16);
-  }
-
-  @Override
   public SignTypeEnum signType() {
     return SignTypeEnum.ARWEAVE;
   }

@@ -40,6 +40,13 @@ public class HttpArSeedingService implements ArSeedingService {
     this.httpClient = httpClient;
   }
 
+  public HttpArSeedingService(String arSeedingHost, String payHost) {
+    this.arSeedingHost = arSeedingHost;
+    this.payHost = payHost;
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    this.httpClient = builder.build();
+  }
+
   @Override
   public InputStream sendJsonRequestToArSeeding(
       String path, String request, HashMap<String, String> headers) throws IOException {

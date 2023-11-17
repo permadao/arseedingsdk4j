@@ -124,7 +124,7 @@ public class ManifestRequest {
             CopyOnWriteArrayList<PayOrder> orders,
             int pathFilesSize,
             int batchSize) throws Exception {
-        ExecutorService threadPool = Executors.newFixedThreadPool(batchSize);
+        ExecutorService threadPool = Executors.newCachedThreadPool();
         CountDownLatch countDownLatch = new CountDownLatch(pathFilesSize);
         for (String pathFile : pathFiles) {
             try {
@@ -141,7 +141,7 @@ public class ManifestRequest {
                                 orders.add(PayOrderConverter.dataSendResponseConvertToPayOrder(order));
                                 manifestData.getPaths().put(pathFile, new ManifestData.Resource(order.getItemId()));
                             } catch (Exception e) {
-                                log.error("ERROR: ", e);
+                                log.error("batch upload error: ", e);
                                 throw new BizException(e.getMessage());
                             } finally {
                                 countDownLatch.countDown();

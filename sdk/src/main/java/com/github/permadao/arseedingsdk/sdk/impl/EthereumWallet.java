@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.permadao.arseedingsdk.codec.Base64Util;
-import com.github.permadao.arseedingsdk.util.HexEncoderUtils;
 import com.github.permadao.arseedingsdk.sdk.Wallet;
 import com.github.permadao.model.wallet.SignTypeEnum;
 import com.github.permadao.model.wallet.WalletFile;
@@ -197,16 +196,6 @@ public class EthereumWallet implements Wallet {
     }
     byteArray[0] = 0x04;
     return Base64Util.base64Encode(byteArray);
-  }
-
-  @Override
-  public String exportPrivateKey() {
-    return Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKey());
-  }
-
-  @Override
-  public String exportPublicKey() {
-    return ecKeyPair.getPublicKey().toString(16);
   }
 
   @Override

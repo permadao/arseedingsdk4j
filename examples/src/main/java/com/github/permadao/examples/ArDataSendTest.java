@@ -22,8 +22,7 @@ public class ArDataSendTest {
 		OkHttpClient.Builder builder =
 				new OkHttpClient.Builder();
 		builder.build();
-		Wallet arweaveWallet = ArweaveWallet.loadArWallet("/Users/wangyao/Desktop/dev/go/ar"
-															  + ".json");
+		Wallet arweaveWallet = ArweaveWallet.loadArWallet("your file path");
 		System.out.println(arweaveWallet.getOwner());
 		System.out.println(arweaveWallet.getAddress());
 		ArSeedingService arSeedingService =
