@@ -106,21 +106,12 @@
     </dependencies>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>github</id>
+            <name>arseeding java sdk</name>
+            <url>https://maven.pkg.github.com/permadao/arseedingsdk4j</url>
         </repository>
     </distributionManagement>
-
-    <scm>
-        <connection>scm:git:git://github.com/permadao/arseedingsdk4j.git</connection>
-        <developerConnection>scm:git:ssh://github.com/permadao/arseedingsdk4j.git</developerConnection>
-        <url>https://github.com/permadao/arseedingsdk4j/tree/main</url>
-    </scm>
 
     <build>
         <plugins>
@@ -185,27 +176,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
             </plugin>
         </plugins>
     </build>
