@@ -28,4 +28,10 @@ public class BundleFee {
     public void setFinalFee(String finalFee) {
         this.finalFee = finalFee;
     }
+
+    @Override
+    public String toString() {
+        return "BundleFee{" + "currency='" + currency + '\'' + ", decimals="
+                       + decimals + ", finalFee='" + finalFee + '\'' + '}';
+    }
 }

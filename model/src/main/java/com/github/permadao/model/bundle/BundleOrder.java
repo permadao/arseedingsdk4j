@@ -1,11 +1,11 @@
 package com.github.permadao.model.bundle;
 
+import java.util.Date;
 
 public class BundleOrder {
     private int id;
-    // TODO 从JSON转换为Object时存在时间转换问题，待定是否引入序列化的包
-    private String createdAt;
-    private String updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
     private String itemId;
     private String signer;
     private int signType;
@@ -29,19 +29,19 @@ public class BundleOrder {
         this.id = id;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -155,5 +155,20 @@ public class BundleOrder {
 
     public void setSort(boolean sort) {
         this.sort = sort;
+    }
+
+    @Override public String toString() {
+        return "BundleOrder{" + "id=" + id + ", createdAt='" + createdAt + '\''
+                       + ", updatedAt='" + updatedAt + '\'' + ", itemId='"
+                       + itemId + '\'' + ", signer='" + signer + '\''
+                       + ", signType=" + signType + ", size=" + size
+                       + ", currency='" + currency + '\'' + ", decimals="
+                       + decimals + ", fee='" + fee + '\''
+                       + ", paymentExpiredTime=" + paymentExpiredTime
+                       + ", expectedBlock=" + expectedBlock
+                       + ", paymentStatus='" + paymentStatus + '\''
+                       + ", paymentId='" + paymentId + '\''
+                       + ", onChainStatus='" + onChainStatus + '\''
+                       + ", apiKey='" + apiKey + '\'' + ", sort=" + sort + '}';
     }
 }

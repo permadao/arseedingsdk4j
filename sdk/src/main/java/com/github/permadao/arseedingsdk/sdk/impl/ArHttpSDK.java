@@ -170,6 +170,9 @@ public class ArHttpSDK implements ArSDK {
     } catch (Exception e) {
       log.error("Response trans to SubmitBundleDataResponse failed.", e);
     }
+    if (submitBundleDataResponse == null) {
+      return null;
+    }
     return submitBundleDataResponse.getItemId();
   }
 
@@ -220,11 +223,10 @@ public class ArHttpSDK implements ArSDK {
 
     AssertUtils.notNull(responseInputStream, "bundle order response cannot be null message!");
 
-    ObjectMapper objectMapper = new ObjectMapper();
     List<BundleOrder> bundleOrderList = new ArrayList<>();
     try {
       bundleOrderList =
-          objectMapper.readValue(responseInputStream, new TypeReference<List<BundleOrder>>() {});
+              objectMapper.readValue(responseInputStream, new TypeReference<List<BundleOrder>>() {});
     } catch (IOException e) {
       log.error("Response trans to BundleOrder list failed.", e);
     }

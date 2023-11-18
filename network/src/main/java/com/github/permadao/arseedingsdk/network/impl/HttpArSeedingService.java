@@ -83,7 +83,7 @@ public class HttpArSeedingService implements ArSeedingService {
     Headers httpHeaders = Headers.of(headers);
     Request request =
             new Request.Builder()
-                    .url(payHost + path).headers(httpHeaders) // Replace with your API
+                    .url(arSeedingHost + path).headers(httpHeaders) // Replace with your API
                     // endpoint
                     .build();
 
